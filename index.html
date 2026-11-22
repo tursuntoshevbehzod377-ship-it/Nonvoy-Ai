@@ -1,1 +1,133 @@
 
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nonvoy AI</title>
+<style>
+*{box-sizing:border-box}
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#101827;
+color:white;
+}
+header{
+padding:20px;
+background:#172338;
+font-size:24px;
+font-weight:bold;
+text-align:center;
+border-bottom:1px solid #34445c;
+}
+header span{color:#38d9a9}
+main{
+max-width:700px;
+margin:auto;
+padding:20px;
+}
+.welcome{text-align:center;margin:55px 0 30px}
+.welcome h1{font-size:30px}
+.welcome p{color:#aab8cc}
+#chat{
+height:55vh;
+overflow-y:auto;
+padding:10px;
+}
+.message{
+padding:13px 16px;
+margin:12px 0;
+border-radius:15px;
+max-width:85%;
+line-height:1.5;
+white-space:pre-wrap;
+}
+.user{
+background:#176b57;
+margin-left:auto;
+}
+.bot{
+background:#26364e;
+margin-right:auto;
+}
+.input-area{
+display:flex;
+gap:8px;
+position:sticky;
+bottom:0;
+background:#101827;
+padding:12px 0;
+}
+input{
+flex:1;
+min-width:0;
+padding:16px;
+border-radius:12px;
+border:1px solid #45546a;
+background:#26364e;
+color:white;
+font-size:16px;
+}
+button{
+border:0;
+border-radius:12px;
+padding:14px;
+background:#38d9a9;
+color:#10251f;
+font-weight:bold;
+font-size:16px;
+}
+footer{text-align:center;color:#8190a5;font-size:12px;padding:15px}
+</style>
+</head>
+<body>
+
+<header>🤖 <span>Nonvoy</span> AI</header>
+
+<main>
+<div class="welcome">
+<h1>Salom! 👋</h1>
+<h2>Men Nonvoy AI</h2>
+<p>Sizga qanday yordam bera olaman?</p>
+</div>
+
+<div id="chat"></div>
+
+<div class="input-area">
+<input id="msg" placeholder="Xabar yozing..." />
+<button onclick="send()">Yuborish</button>
+</div>
+<footer>Nonvoy AI © 2026</footer>
+</main>
+
+<script>
+function send(){
+const input=document.getElementById("msg");
+const chat=document.getElementById("chat");
+const value=input.value.trim();
+
+if(!value)return;
+
+const user=document.createElement("div");
+user.className="message user";
+user.textContent=value;
+chat.appendChild(user);
+
+input.value="";
+
+const bot=document.createElement("div");
+bot.className="message bot";
+bot.textContent="Salom! Men Nonvoy AI. Hozircha dastlabki versiyam ishlayapti. Haqiqiy AI xizmatim tez orada ulanadi.";
+chat.appendChild(bot);
+
+chat.scrollTop=chat.scrollHeight;
+}
+
+document.getElementById("msg").addEventListener("keydown",function(e){
+if(e.key==="Enter")send();
+});
+</script>
+
+</body>
+</html>
