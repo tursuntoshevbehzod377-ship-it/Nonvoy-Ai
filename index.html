@@ -3,129 +3,172 @@
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nonvoy AI</title>
+
 <style>
 *{box-sizing:border-box}
 body{
-margin:0;
-font-family:Arial,sans-serif;
-background:#101827;
-color:white;
+ margin:0;
+ font-family:Arial,sans-serif;
+ background:#101827;
+ color:white;
 }
 header{
-padding:20px;
-background:#172338;
-font-size:24px;
-font-weight:bold;
-text-align:center;
-border-bottom:1px solid #34445c;
+ padding:20px;
+ text-align:center;
+ background:#172338;
+ font-size:24px;
+ font-weight:bold;
+ color:#38d9a9;
 }
-header span{color:#38d9a9}
 main{
-max-width:700px;
-margin:auto;
-padding:20px;
+ max-width:700px;
+ margin:auto;
+ padding:15px;
 }
-.welcome{text-align:center;margin:55px 0 30px}
-.welcome h1{font-size:30px}
+.welcome{
+ text-align:center;
+ margin:35px 0;
+}
 .welcome p{color:#aab8cc}
 #chat{
-height:55vh;
-overflow-y:auto;
-padding:10px;
+ height:60vh;
+ overflow-y:auto;
+ padding:10px;
 }
 .message{
-padding:13px 16px;
-margin:12px 0;
-border-radius:15px;
-max-width:85%;
-line-height:1.5;
-white-space:pre-wrap;
+ padding:14px;
+ margin:12px 0;
+ border-radius:15px;
+ max-width:85%;
+ line-height:1.5;
+ white-space:pre-wrap;
 }
 .user{
-background:#176b57;
-margin-left:auto;
+ background:#176b57;
+ margin-left:auto;
 }
 .bot{
-background:#26364e;
-margin-right:auto;
+ background:#26364e;
+ margin-right:auto;
 }
 .input-area{
-display:flex;
-gap:8px;
-position:sticky;
-bottom:0;
-background:#101827;
-padding:12px 0;
+ display:flex;
+ gap:8px;
+ position:sticky;
+ bottom:0;
+ background:#101827;
+ padding:12px 0;
 }
 input{
-flex:1;
-min-width:0;
-padding:16px;
-border-radius:12px;
-border:1px solid #45546a;
-background:#26364e;
-color:white;
-font-size:16px;
+ flex:1;
+ min-width:0;
+ padding:16px;
+ border-radius:12px;
+ border:1px solid #45546a;
+ background:#26364e;
+ color:white;
+ font-size:16px;
 }
 button{
-border:0;
-border-radius:12px;
-padding:14px;
-background:#38d9a9;
-color:#10251f;
-font-weight:bold;
-font-size:16px;
+ border:0;
+ border-radius:12px;
+ padding:14px;
+ background:#38d9a9;
+ font-size:16px;
+ font-weight:bold;
 }
-footer{text-align:center;color:#8190a5;font-size:12px;padding:15px}
+button:disabled{opacity:.5}
+footer{
+ text-align:center;
+ color:#8793a8;
+ padding:25px;
+}
 </style>
 </head>
+
 <body>
 
-<header>🤖 <span>Nonvoy</span> AI</header>
+<header>Nonvoy AI</header>
 
 <main>
 <div class="welcome">
-<h1>Salom! 👋</h1>
-<h2>Men Nonvoy AI</h2>
+<h1>Men Nonvoy AI</h1>
 <p>Sizga qanday yordam bera olaman?</p>
 </div>
 
 <div id="chat"></div>
 
 <div class="input-area">
-<input id="msg" placeholder="Xabar yozing..." />
-<button onclick="send()">Yuborish</button>
+<input id="msg" placeholder="Xabar yozing...">
+<button id="send" onclick="send()">Yuborish</button>
 </div>
-<footer>Nonvoy AI © 2026</footer>
+
 </main>
 
+<footer>Nonvoy AI © 2026</footer>
+
 <script>
-function send(){
-const input=document.getElementById("msg");
 const chat=document.getElementById("chat");
-const value=input.value.trim();
+const input=document.getElementById("msg");
+const button=document.getElementById("send");
 
-if(!value)return;
+let history=[];
 
-const user=document.createElement("div");
-user.className="message user";
-user.textContent=value;
-chat.appendChild(user);
-
-input.value="";
-
-const bot=document.createElement("div");
-bot.className="message bot";
-bot.textContent="Salom! Men Nonvoy AI. Hozircha dastlabki versiyam ishlayapti. Haqiqiy AI xizmatim tez orada ulanadi.";
-chat.appendChild(bot);
-
-chat.scrollTop=chat.scrollHeight;
+function addMessage(text,type){
+ const div=document.createElement("div");
+ div.className="message "+type;
+ div.textContent=text;
+ chat.appendChild(div);
+ chat.scrollTop=chat.scrollHeight;
+ return div;
 }
 
-document.getElementById("msg").addEventListener("keydown",function(e){
-if(e.key==="Enter")send();
+async function send(){
+ const message=input.value.trim();
+ if(!message)return;
+
+ input.value="";
+ button.disabled=true;
+
+ addMessage(message,"user");
+
+ const loading=addMessage("Nonvoy AI o‘ylayapti...","bot");
+
+ try{
+  const response=await fetch("/api/chat",{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({
+    message:message,
+    history:history
+   })
+  });
+
+  const data=await response.json();
+
+  if(!response.ok){
+   throw new Error(data.error || "AI xatoligi");
+  }
+
+  loading.textContent=data.reply;
+
+  history.push(
+   {role:"user",content:message},
+   {role:"assistant",content:data.reply}
+  );
+
+ }catch(error){
+  loading.textContent="Xatolik: "+error.message;
+ }
+
+ button.disabled=false;
+ input.focus();
+}
+
+input.addEventListener("keydown",function(e){
+ if(e.key==="Enter")send();
 });
 </script>
 
