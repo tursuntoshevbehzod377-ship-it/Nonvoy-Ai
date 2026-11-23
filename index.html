@@ -78,9 +78,20 @@ async function send(){
     addMessage("Video tez orada qo'shiladi. Hozircha Rasm rejimini ishlating.","ai");
     button.disabled=false; input.focus(); return;
   }
- seed="+Math.floor(Math.random()*999999)+" 
+  if(isImage){
+    let prompt=message.replace(/rasm chiz|rasmini chiz|chiz|draw|generate image/gi,"").trim();
+    if(!prompt) prompt=message;
+    let engPrompt=prompt;
+    const dict={qizil:"red",mashina:"car",mushuk:"cat",it:"dog",uy:"house",gul:"flower",tog:"mountain",dengiz:"sea",qiz:"girl",bola:"boy",shahar:"city",osmon:"sky",quyosh:"sun",oy:"moon",daraxt:"tree",at:"horse",qush:"bird",olma:"apple",kitob:"book",telefon:"phone",kompyuter:"computer",robot:"robot",samolyot:"airplane",poezd:"train",kema:"ship",yomgir:"rain",qor:"snow"};
+    Object.keys(dict).forEach(k=>{ engPrompt=engPrompt.replace(new RegExp(k,"gi"),dict[k]); });
+    engPrompt="high quality photo of "+engPrompt;
+    const imgUrl="https://image.pollinations.ai/prompt/"+encodeURIComponent(engPrompt)+"?width=1024&height=1024&seed="+Math.floor(Math.random()*999999)+"&nologo=true&model=flux";
+    const imgDiv=addMessage("","ai");
+    imgDiv.textContent="Rasm tayyorlanmoqda...";
+    const img=document.createElement("img");
+    img.src=imgUrl;
     img.onload=()=>{ imgDiv.textContent=""; imgDiv.appendChild(img); const dl=document.createElement("a"); dl.href=imgUrl; dl.download="nonvoy.png"; dl.textContent="Yuklab olish"; imgDiv.appendChild(dl); };
-    img.onerror=()=>{ imgDiv.textContent="Rasm chiqmadı, qayta urinib ko'ring."; };
+    img.onerror=()=>{ imgDiv.textContent="Rasm chiqmadi, qayta urinib ko'ring."; };
     history.push({role:"user",content:message},{role:"assistant",content:"Rasm yaratildi: "+prompt});
     button.disabled=false; input.focus(); return;
   }
