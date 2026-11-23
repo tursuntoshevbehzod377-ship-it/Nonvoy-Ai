@@ -78,14 +78,7 @@ async function send(){
     addMessage("Video tez orada qo'shiladi. Hozircha Rasm rejimini ishlating.","ai");
     button.disabled=false; input.focus(); return;
   }
-  if(isImage){
-    let prompt=message.replace(/rasm chiz|rasmini chiz|chiz|draw|generate image/gi,"").trim();
-    if(!prompt) prompt=message;
-    const imgUrl="https://image.pollinations.ai/prompt/"+encodeURIComponent(prompt)+"?width=1024&height=1024&seed="+Date.now()+"&nologo=true";
-    const imgDiv=addMessage("","ai");
-    imgDiv.textContent="Rasm tayyorlanmoqda...";
-    const img=document.createElement("img");
-    img.src=imgUrl;
+ seed="+Math.floor(Math.random()*999999)+" 
     img.onload=()=>{ imgDiv.textContent=""; imgDiv.appendChild(img); const dl=document.createElement("a"); dl.href=imgUrl; dl.download="nonvoy.png"; dl.textContent="Yuklab olish"; imgDiv.appendChild(dl); };
     img.onerror=()=>{ imgDiv.textContent="Rasm chiqmadı, qayta urinib ko'ring."; };
     history.push({role:"user",content:message},{role:"assistant",content:"Rasm yaratildi: "+prompt});
