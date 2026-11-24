@@ -2,171 +2,80 @@
 <html lang="uz">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nonvoy AI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nonvoy AI — Vodiy noni</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#0f172a;color:#fff;display:flex;flex-direction:column;min-height:100vh}
-header{padding:16px;text-align:center;font-weight:bold;font-size:20px;background:#020617}
-main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin:0 auto;padding:12px}
-.welcome{text-align:center;margin:20px 0}
-.welcome h1{margin:0;font-size:26px}
-.welcome p{color:#94a3b8}
-#chat{flex:1;display:flex;flex-direction:column;gap:10px;overflow-y:auto;padding-bottom:10px}
-.message{max-width:85%;padding:10px 14px;border-radius:14px;line-height:1.5;word-wrap:break-word}
-.message.user{background:#22c55e;color:#000;align-self:flex-end}
-.message.ai{background:#1e293b;align-self:flex-start}
-.message.ai img,.message.ai video,.message.ai canvas{width:100%;border-radius:12px;margin-top:8px}
-.message.ai a{color:#22c55e;display:block;margin-top:6px}
-.mode-bar{display:flex;gap:8px;margin-bottom:8px}
-.mode-btn{flex:1;padding:9px;border-radius:10px;border:none;background:#1e293b;color:#fff;font-weight:bold}
-.mode-btn.active{background:#22c55e;color:#000}
-.input-area{display:flex;gap:8px}
-#msg{flex:1;padding:12px;border-radius:12px;border:none;outline:none;background:#1e293b;color:#fff}
-#send{padding:12px 18px;border-radius:12px;border:none;background:#22c55e;font-weight:bold}
-footer{text-align:center;padding:10px;color:#64748b;font-size:13px}
+body{margin:0;font-family:Arial,sans-serif;background:#ffd6e7;color:#222;display:flex;flex-direction:column;min-height:100vh}
+header{padding:14px 12px 6px;text-align:center;position:relative}
+.dots{position:absolute;right:12px;top:12px;font-size:26px;background:#fff;border:2px solid #16a34a;border-radius:10px;padding:2px 10px;cursor:pointer}
+.newbtn{position:absolute;right:62px;top:12px;font-size:20px;background:#16a34a;color:#fff;border:none;border-radius:10px;padding:6px 12px;cursor:pointer}
+.menu{position:absolute;left:12px;top:12px;font-size:24px;background:#fff;border:2px solid #16a34a;border-radius:10px;padding:2px 10px;cursor:pointer}
+.logo{width:110px;height:110px;border-radius:50%;border:4px solid #16a34a;object-fit:cover;background:#fff;display:block;margin:6px auto 4px}
+h1{margin:4px 0 0;color:#15803d;font-size:28px}
+.sub{margin:2px 0 8px;color:#555}
+#sidebar{display:none;background:#fff;margin:8px 12px;border-radius:14px;padding:12px;border:2px solid #16a34a}
+#sidebar div{padding:8px;border-bottom:1px solid #eee;cursor:pointer}
+#chat{flex:1;overflow-y:auto;background:#fff5f8;border-radius:16px;padding:12px;border:2px solid #fff}
+.msg{max-width:88%;padding:10px 12px;border-radius:14px;margin:8px 0;white-space:pre-wrap;word-break:break-word}
+.msg.user{background:#16a34a;color:#fff;margin-left:auto}
+.msg.ai{background:#ffe4ef}
+.msg img{max-width:100%;border-radius:12px;cursor:zoom-in}
+#previewBox{display:none;background:#fff;border-radius:12px;padding:8px;margin:8px 0;position:relative}
+#previewBox img{width:100%;border-radius:10px}
+#removeImg{position:absolute;right:14px;top:14px;background:#ef4444;color:#fff;border:none;border-radius:50%;width:30px;height:30px;font-size:18px}
+#form{display:flex;gap:8px;margin-top:10px;align-items:center}
+#plus{width:46px;height:46px;border-radius:50%;background:#16a34a;color:#fff;font-size:28px;border:none}
+#input{flex:1;padding:13px;border-radius:24px;border:2px solid #16a34a;outline:none;font-size:16px}
+#send{background:#16a34a;color:#fff;border:none;border-radius:24px;padding:13px 18px;font-size:16px}
+#bigImg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:99;align-items:center;justify-content:center}
+#bigImg img{max-width:95%;max-height:90%;border-radius:12px}
 </style>
 </head>
 <body>
-<header>Nonvoy AI</header>
+<header>
+<button class="menu" onclick="toggleSide()">☰</button>
+<button class="newbtn" onclick="newChat()">＋ Yangi</button>
+<button class="dots" onclick="alert('Vodiy noni — Nonvoy AI')">⋮</button>
+<img class="logo" src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400" alt="Vodiy noni">
+<h1>Vodiy noni</h1>
+<p class="sub">Nonvoy AI — rasm chizadi, rasmni tahlil qiladi, dars savollariga javob beradi</p>
+</header>
+<div id="sidebar"><b>Oldingi suhbatlar</b><div id="history"></div><div onclick="newChat()">＋ Yangi suhbat</div></div>
 <main>
-<div class="welcome">
-<h1>Men Nonvoy AI</h1>
-<p>Sizga qanday yordam bera olaman?</p>
-</div>
-<div id="chat"></div>
-<div class="mode-bar">
-<button class="mode-btn active" data-mode="text" onclick="setMode('text')">Matn</button>
-<button class="mode-btn" data-mode="image" onclick="setMode('image')">Rasm</button>
-<button class="mode-btn" data-mode="video" onclick="setMode('video')">Video</button>
-</div>
-<div class="input-area">
-<input id="msg" placeholder="Xabar yozing...">
-<button id="send" onclick="send()">Yuborish</button>
-</div>
+<div id="chat"><div class="msg ai">Salom! Men Nonvoy AI man.</div></div>
+<div id="previewBox"><img id="preview"><button id="removeImg" onclick="clearImg()">✕</button></div>
+<form id="form" onsubmit="sendMsg(event)">
+<button type="button" id="plus" onclick="document.getElementById('file').click()">＋</button>
+<input type="file" id="file" accept="image/*" hidden onchange="onFile(event)">
+<input id="input" placeholder="Yozing...">
+<button id="send">➤</button>
+</form>
 </main>
-<footer>Nonvoy AI © 2026</footer>
+<div id="bigImg" onclick="this.style.display='none'"><img id="bigPic"></div>
 <script>
-const chat=document.getElementById("chat");
-const input=document.getElementById("msg");
-const button=document.getElementById("send");
-let history=[];
-let currentMode="text";
-function setMode(m){
-  currentMode=m;
-  document.querySelectorAll(".mode-btn").forEach(b=>{
-    b.classList.toggle("active", b.dataset.mode===m);
-  });
-}
-function addMessage(text,type){
-  const div=document.createElement("div");
-  div.className="message "+type;
-  div.textContent=text;
-  chat.appendChild(div);
-  chat.scrollTop=chat.scrollHeight;
-  return div;
-}
-function translate(prompt){
-  let e=prompt;
-  const dict={qizil:"red",mashina:"car",mushuk:"cat",it:"dog",uy:"house",gul:"flower",tog:"mountain",dengiz:"sea",qiz:"woman",bola:"boy",shahar:"city",osmon:"sky",quyosh:"sun",oy:"moon",daraxt:"tree",at:"horse",qush:"bird",olma:"apple",kitob:"book",telefon:"phone",kompyuter:"computer",robot:"robot",samolyot:"airplane",poezd:"train",kema:"ship",yomgir:"rain",qor:"snow"};
-  Object.keys(dict).forEach(k=>{ e=e.replace(new RegExp(k,"gi"),dict[k]); });
-  return "photorealistic professional high-end DSLR photograph, natural realistic human face, sharp eyes, fine skin and hair details, crisp focus, detailed clothing texture, realistic hands, balanced natural lighting, rich but natural colors, clear detailed background, high quality, "+e;
-}
-function makeImageUrl(prompt){
-  const seed=Math.floor(Math.random()*999999);
-  return "https://image.pollinations.ai/prompt/"+encodeURIComponent(translate(prompt))+"?width=1024&height=1024&seed="+seed+"&nologo=true&model=flux&enhance=true";
-}
-function makeVideoFromImage(imgUrl,box){
-  const img=new Image();
-  img.crossOrigin="anonymous";
-  img.src=imgUrl;
-  img.onload=()=>{
-    const canvas=document.createElement("canvas");
-    canvas.width=640; canvas.height=640;
-    box.appendChild(canvas);
-    const ctx=canvas.getContext("2d");
-    const stream=canvas.captureStream(30);
-    const chunks=[];
-    const rec=new MediaRecorder(stream,{mimeType:"video/webm"});
-    rec.ondataavailable=e=>{ if(e.data.size>0) chunks.push(e.data); };
-    rec.onstop=()=>{
-      const blob=new Blob(chunks,{type:"video/webm"});
-      const url=URL.createObjectURL(blob);
-      const v=document.createElement("video");
-      v.src=url; v.controls=true; v.loop=true; v.autoplay=true;
-      box.appendChild(v);
-      const dl=document.createElement("a");
-      dl.href=url; dl.download="nonvoy-video.webm"; dl.textContent="Videoni yuklab olish";
-      box.appendChild(dl);
-    };
-    let start=performance.now();
-    rec.start();
-    function draw(now){
-      const t=(now-start)/5000;
-      if(t>=1){ rec.stop(); return; }
-      const zoom=1+t*0.35;
-      const w=640*zoom, h=640*zoom;
-      const x=(640-w)/2 + Math.sin(t*3)*20;
-      const y=(640-h)/2;
-      ctx.fillStyle="#000"; ctx.fillRect(0,0,640,640);
-      ctx.drawImage(img,x,y,w,h);
-      requestAnimationFrame(draw);
-    }
-    requestAnimationFrame(draw);
-  };
-  img.onerror=()=>{ box.textContent="Video yasalmadi, qayta urinib ko'ring."; };
-}
-async function send(){
-  const message=input.value.trim();
-  if(!message) return;
-  input.value="";
-  button.disabled=true;
-  addMessage(message,"user");
-  const low=message.toLowerCase();
-  const isImage = currentMode==="image" || low.includes("rasm chiz") || low.includes("rasmini chiz") || low.includes("chiz") || low.includes("draw") || low.includes("generate image");
-  const isVideo = currentMode==="video";
-  if(isVideo){
-    let prompt=message.replace(/video|rasm chiz|rasmini chiz|chiz|draw/gi,"").trim();
-    if(!prompt) prompt=message;
-    const box=addMessage("","ai");
-    box.textContent="Video tayyorlanmoqda... 5 soniya kuting";
-    const imgUrl=makeImageUrl(prompt);
-    box.textContent="";
-    makeVideoFromImage(imgUrl,box);
-    history.push({role:"user",content:message},{role:"assistant",content:"Video yaratildi: "+prompt});
-    button.disabled=false; input.focus(); return;
-  }
-  if(isImage){
-    let prompt=message.replace(/rasm chiz|rasmini chiz|chiz|draw|generate image/gi,"").trim();
-    if(!prompt) prompt=message;
-    const imgUrl=makeImageUrl(prompt);
-    const imgDiv=addMessage("","ai");
-    imgDiv.textContent="Rasm tayyorlanmoqda...";
-    const img=document.createElement("img");
-    img.src=imgUrl;
-    img.onload=()=>{ imgDiv.textContent=""; imgDiv.appendChild(img); const dl=document.createElement("a"); dl.href=imgUrl; dl.download="nonvoy.png"; dl.textContent="Yuklab olish"; imgDiv.appendChild(dl); };
-    img.onerror=()=>{ imgDiv.textContent="Rasm chiqmadi, qayta urinib ko'ring."; };
-    history.push({role:"user",content:message},{role:"assistant",content:"Rasm yaratildi: "+prompt});
-    button.disabled=false; input.focus(); return;
-  }
-  const loading=addMessage("Nonvoy AI yozmoqda...","ai");
-  try{
-    const response=await fetch("/api/chat",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({message:message,history:history})
-    });
-    const data=await response.json();
-    loading.textContent=data.reply || "Xatolik yuz berdi";
-    history.push({role:"user",content:message},{role:"assistant",content:data.reply});
-  }catch(e){
-    loading.textContent="Xatolik: Qayta urinib ko'ring. API keyni tekshiring.";
-  }
-  button.disabled=false;
-  input.focus();
-}
-input.addEventListener("keydown",function(e){ if(e.key==="Enter") send(); });
-button.addEventListener("click",send);
+let chats=JSON.parse(localStorage.getItem('nonvoy_chats')||'[]');
+let cur=0; let imgData=null; let waitingDraw=false;
+const chatEl=document.getElementById('chat');
+function save(){localStorage.setItem('nonvoy_chats',JSON.stringify(chats)); renderHistory();}
+function renderHistory(){document.getElementById('history').innerHTML=chats.map((c,i)=>`<div onclick="openChat(${i})">${(c[0]&&c[0].t?c[0].t.slice(0,35):'Suhbat')}</div>`).join('')||'Hali suhbat yo‘q';}
+function render(){chatEl.innerHTML=(chats[cur]||[]).map(m=>`<div class="msg ${m.who}">${m.img?`<img src="${m.img}" onclick="zoom(this.src)"><br>`:''}${m.t}</div>`).join('')||'<div class="msg ai">Salom! Men Nonvoy AI man.</div>';chatEl.scrollTop=chatEl.scrollHeight;}
+function add(who,t,img){if(!chats[cur])chats[cur]=[];chats[cur].push({who,t,img:img||''});save();render();}
+function newChat(){chats.unshift([]);cur=0;save();render();}
+function openChat(i){cur=i;render();document.getElementById('sidebar').style.display='none';}
+function toggleSide(){let s=document.getElementById('sidebar');s.style.display=s.style.display==='block'?'none':'block';}
+function onFile(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{imgData=r.result;document.getElementById('preview').src=imgData;document.getElementById('previewBox').style.display='block';};r.readAsDataURL(f);}
+function clearImg(){imgData=null;document.getElementById('previewBox').style.display='none';document.getElementById('file').value='';}
+function zoom(s){document.getElementById('bigPic').src=s;document.getElementById('bigImg').style.display='flex';}
+async function sendMsg(e){e.preventDefault();let inp=document.getElementById('input');let text=inp.value.trim();let myImg=imgData;if(!text&&!myImg)return;if(myImg)add('user',text||'Bu rasmda nima bor?',myImg);else add('user',text);inp.value='';clearImg();
+let low=text.toLowerCase();
+if(low.includes('rasm chizib ber')){waitingDraw=true;add('ai','Qanaqa rasm chizib beray?');return;}
+if(low.includes('qizni rasmini')||low.includes('qiz bolani rasmi')){add('ai','Chizib beryapman...');let img=await drawImage('beautiful Uzbek girl, smiling, traditional dress');add('ai','Mana qiz bolani rasmi',img);return;}
+if(waitingDraw){waitingDraw=false;add('ai','Chizib beryapman...');let img=await drawImage(text);add('ai','Mana rasmingiz',img);return;}
+add('ai','O‘ylayapman...');
+try{let res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,image:myImg})});let d=await res.json();let els=document.querySelectorAll('.msg.ai');els[els.length-1].textContent=d.reply||d.text||'Javob kelmadi';}catch(err){let els=document.querySelectorAll('.msg.ai');els[els.length-1].textContent='Serverda xatolik.';}}
+async function drawImage(prompt){try{let res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:'Rasm chiz: '+prompt,draw:true})});let d=await res.json();if(d.image)return d.image;}catch(e){}return 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800';}
+if(chats.length===0)chats=[[]];renderHistory();render();
 </script>
 </body>
 </html>
