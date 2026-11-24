@@ -6,32 +6,32 @@
 <title>Vodiy noni - Nonvoy AI</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:sans-serif;background:#fff;display:flex;flex-direction:column;height:100vh}
-header{display:flex;align-items:center;gap:10px;padding:12px;border-bottom:1px solid #eee}
-.logo{width:52px;height:52px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 2px #e8a400}
+body{font-family:sans-serif;background:#ffeef5;display:flex;flex-direction:column;height:100vh}
+/* ✅ Sahifa ichi - PUSHTI */
+header{display:flex;align-items:center;gap:10px;padding:12px;border-bottom:1px solid #ffc7dd;background:#fff}
+.logo{width:52px;height:52px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 2px #0a9a3a}
 .logo-text{display:flex;flex-direction:column;line-height:1.1}
 .logo-text b{font-size:22px;color:#111}
-.logo-text span{font-size:12px;color:#e8a400;font-weight:700;letter-spacing:1px}
-h1{font-size:22px}
-#chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.logo-text span{font-size:12px;color:#0a9a3a;font-weight:700;letter-spacing:1px}
+#chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:#ffeef5}
 .bubble{max-width:88%;padding:12px 14px;border-radius:18px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
 .me{align-self:flex-end;background:#d3f8d3}
-.ai{align-self:flex-start;background:#f1f1f1}
+.ai{align-self:flex-start;background:#ffffff}
 .bubble img{width:100%;border-radius:12px;margin-top:8px;display:block;cursor:zoom-in}
 .ask-box{background:#fff7d6;border:1px solid #f5d76e;padding:12px;border-radius:14px}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .chip{border:1px solid #ddd;background:#fff;padding:8px 12px;border-radius:20px;cursor:pointer;font-size:14px}
-footer{padding:10px 12px 14px;border-top:1px solid #eee}
+footer{padding:10px 12px 14px;border-top:1px solid #ffc7dd;background:#fff}
 .input-wrap{display:flex;gap:8px;background:#f1f1f1;border-radius:30px;padding:6px}
 #plus{width:38px;height:38px;border-radius:50%;border:none;background:#fff;font-size:22px;cursor:pointer}
 #inp{flex:1;border:none;outline:none;background:transparent;font-size:16px;padding:10px 0}
-#send{width:42px;height:42px;border-radius:50%;border:none;background:#111;color:#fff;font-size:20px;cursor:pointer}
+#send{width:42px;height:42px;border-radius:50%;border:none;background:#0a9a3a;color:#fff;font-size:20px;cursor:pointer}
 .modes{display:flex;gap:8px;justify-content:center;margin-top:10px}
-.mode{border:1px solid #ddd;background:#fff;padding:10px 20px;border-radius:20px;font-size:14px;font-weight:600;cursor:pointer}
-.mode.on{background:#111;color:#fff}
+.mode{border:1px solid #0a9a3a;background:#0a9a3a;color:#fff;padding:10px 20px;border-radius:20px;font-size:14px;font-weight:600;cursor:pointer}
+.mode.on{background:#0a7a2e;color:#fff}
 #fileInput{display:none}
 .preview-box{margin:8px 12px 0;display:none;align-items:center}
-.preview-box img{width:80px;height:80px;object-fit:cover;border-radius:12px;border:2px solid #f5b301}
+.preview-box img{width:80px;height:80px;object-fit:cover;border-radius:12px;border:2px solid #0a9a3a}
 #lightbox{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.92);z-index:100;align-items:center;justify-content:center}
 #lightbox.show{display:flex}
 #lightbox img{max-width:95%;max-height:85vh;border-radius:12px}
@@ -40,8 +40,8 @@ footer{padding:10px 12px 14px;border-top:1px solid #eee}
 </head>
 <body>
 <header>
-  <!-- ✅ VODIY NONI LOGOTIPI - Dumaloq, tilla rang, naqshli non -->
-  <svg class="logo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#e8a400"/><circle cx="50" cy="50" r="44" fill="#f5b301"/><circle cx="50" cy="50" r="36" fill="#f9c83a"/><circle cx="50" cy="50" r="16" fill="#c98a00"/><circle cx="50" cy="50" r="16" fill="none" stroke="#8a5a00" stroke-width="1" stroke-dasharray="3 3"/><g stroke="#8a5a00" stroke-width="2" fill="none"><path d="M50 14 L50 30 M50 70 L50 86 M14 50 L30 50 M70 50 L86 50 M25 25 L36 36 M64 64 L75 75 M75 25 L64 36 M36 64 L25 75"/><circle cx="50" cy="50" r="8" fill="#a06a00"/></g><g fill="#3a2400"><circle cx="42" cy="42" r="1.5"/><circle cx="58" cy="42" r="1.5"/><circle cx="42" cy="58" r="1.5"/><circle cx="58" cy="58" r="1.5"/><circle cx="50" cy="34" r="1.5"/><circle cx="50" cy="66" r="1.5"/></g></svg>
+  <!-- ✅ LOGOTIP SHAKLI O'ZGARMADI - FAQAT RANGI YASHIL BO'LDI -->
+  <svg class="logo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#0a9a3a"/><circle cx="50" cy="50" r="44" fill="#17b84a"/><circle cx="50" cy="50" r="36" fill="#2ecc71"/><circle cx="50" cy="50" r="16" fill="#0a7a2e"/><circle cx="50" cy="50" r="16" fill="none" stroke="#064d1c" stroke-width="1" stroke-dasharray="3 3"/><g stroke="#064d1c" stroke-width="2" fill="none"><path d="M50 14 L50 30 M50 70 L50 86 M14 50 L30 50 M70 50 L86 50 M25 25 L36 36 M64 64 L75 75 M75 25 L64 36 M36 64 L25 75"/><circle cx="50" cy="50" r="8" fill="#0a5a22"/></g><g fill="#eafff0"><circle cx="42" cy="42" r="1.5"/><circle cx="58" cy="42" r="1.5"/><circle cx="42" cy="58" r="1.5"/><circle cx="58" cy="58" r="1.5"/><circle cx="50" cy="34" r="1.5"/><circle cx="50" cy="66" r="1.5"/></g></svg>
   <div class="logo-text"><b>Vodiy noni</b><span>NONVOY AI</span></div>
 </header>
 <div id="chat"></div>
@@ -71,13 +71,24 @@ function addHtml(html,who){
 }
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 add('Salom! Men Vodiy noni - Nonvoy AI man.\n\nNima qila olaman:\n- Rasm chizib beraman\n- Yuborgan rasmni tahlil qilaman\n- Fanlardan savollarga javob beraman: matematika, fizika, kimyo, biologiya, tarix, geografiya, adabiyot, ingliz tili\n\nSavolingizni yozing!','ai');
-var dict={qizil:'red',qiz:'girl',mashina:'car',gul:'flower',tog:'mountain',dengiz:'sea',ot:'horse',mushuk:'cat',it:'dog',uy:'house',qush:'bird',olma:'apple',non:'bread'};
-function toEn(t){var s=' '+t.toLowerCase()+' ';for(var k in dict){s=s.split(k).join(dict[k]);}return s.trim();}
+var dict={qizil:'red',qiz:'girl',mashina:'car',gul:'flower',tog:'mountain',dengiz:'sea',ot:'horse',mushuk:'cat',it:'dog',uy:'house',qush:'bird',olma:'apple',non:'bread',qizni:'girl',otni:'horse'};
+function toEn(t){var s=' '+t.toLowerCase()+' ';for(var k in dict){s=s.split(k).join(' '+dict[k]+' ');}return s.trim().replace(/  +/g,' ');}
 function isVagueImage(t){
   var s=t.toLowerCase().trim();
-  return s==='rasm chizib ber'||s==='rasm chiz'||s==='rasm yasab ber'||s==='rasm'||s==='rasm kerak'||s==='rasm yarat'||s==='rasm yaratib ber'||s==='chizib ber'||s==='rasm chizib bering';
+  return s==='rasm chizib ber'||s==='rasm chiz'||s==='rasm yasab ber'||s==='rasm'||s==='rasm kerak'||s==='rasm yarat'||s==='rasm yaratib ber'||s==='chizib ber'||s==='rasm chizib bering'||s==='rasm chizib ber';
 }
-function isImageReq(t){var s=t.toLowerCase();return s.indexOf('chiz')>=0||s.indexOf('yasab ber')>=0||s.indexOf('yaratib ber')>=0;}
+function isImageReq(t){
+  var s=t.toLowerCase();
+  if(s.indexOf('bu rasmda')>=0) return false;
+  if(s.indexOf('rasmda nima')>=0) return false;
+  if(s.indexOf('chiz')>=0) return true;
+  if(s.indexOf('yasab ber')>=0) return true;
+  if(s.indexOf('yaratib ber')>=0) return true;
+  if(s.indexOf('rasmini')>=0) return true;
+  if(s.indexOf('rasmi')>=0) return true;
+  if(s.indexOf('rasm')>=0 && s.indexOf('?')<0) return true;
+  return false;
+}
 function askImage(){
   waitingImage=true;
   var d=addHtml('<div class="ask-box"><b>Qanaqa rasm chizib beray?</b><br>Mavzuni yozing.</div><div class="chips"></div>','ai');
@@ -90,7 +101,9 @@ function askImage(){
 }
 document.getElementById('btnRasm').addEventListener('click',function(){askImage();});
 function generateImage(promptUz){
-  var promptEn=toEn(promptUz);
+  var clean = promptUz.replace(/rasmini/gi,'').replace(/rasmi/gi,'').replace(/rasm/gi,'').replace(/chizib ber/gi,'').replace(/chiz/gi,'').replace(/yasab ber/gi,'').replace(/yaratib ber/gi,'').trim();
+  if(!clean) clean = promptUz;
+  var promptEn=toEn(clean);
   var b=add('Rasm tayyorlanyapti...','ai');
   var seed=Math.floor(Math.random()*999999);
   var url='https://image.pollinations.ai/prompt/'+encodeURIComponent('Beautiful, sharp, cinematic, high quality photo, '+promptEn)+'?width=1024&height=1024&seed='+seed+'&nologo=true';
@@ -119,24 +132,4 @@ function send(){
   if(isImageReq(t)){generateImage(t);return;}
   var b2=add('Yozilyapti...','ai');
   fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:t})})
-  .then(function(r){return r.json();}).then(function(d){b2.textContent=d.reply||d.error||'Xato';})
-  .catch(function(e){b2.textContent='Xato: '+e.message;});
-}
-document.getElementById('send').addEventListener('click',send);
-inp.addEventListener('keydown',function(e){if(e.key==='Enter')send();});
-document.getElementById('plus').addEventListener('click',function(){document.getElementById('fileInput').click();});
-document.getElementById('fileInput').addEventListener('change',function(e){
-  var f=e.target.files[0];if(!f)return;
-  var rd=new FileReader();
-  rd.onload=function(){pendingImage=rd.result;document.getElementById('previewImg').src=rd.result;document.getElementById('previewBox').style.display='flex';inp.placeholder='Bu rasmda nima bor? deb yozing...';inp.focus();};
-  rd.readAsDataURL(f);e.target.value='';
-});
-chat.addEventListener('click',function(e){
-  var img=e.target.closest('img');
-  if(img){document.getElementById('lightboxImg').src=img.src;document.getElementById('lightbox').classList.add('show');}
-});
-document.getElementById('lightbox').addEventListener('click',function(){this.classList.remove('show');});
-document.getElementById('lightboxClose').addEventListener('click',function(e){e.stopPropagation();document.getElementById('lightbox').classList.remove('show');});
-</script>
-</body>
-</html>
+  .then(function(r){return r.json();}).then(function(d){b
