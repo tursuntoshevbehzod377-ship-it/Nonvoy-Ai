@@ -73,7 +73,7 @@ function translate(prompt){
   return "beautiful, highly detailed, cinematic lighting, ultra realistic, 8k, professional photography, "+e+", beautiful background, sharp focus, vibrant colors";
 }
 function makeImageUrl(prompt){
-  return "https://image.pollinations.ai/prompt/"+encodeURIComponent(translate(prompt))+"?width=1024&height=1024&seed="+Math.floor(Math.random()*999999)+"&nologo=true&model=flux";
+  return "https://image.pollinations.ai/prompt/"+encodeURIComponent(translate(prompt))+"?width=1024&height=1024&seed="+Math.floor(Math.random()*999999)+"&nologo=true&enhance=true&model=flux";
 }
 function makeVideoFromImage(imgUrl,box){
   const img=new Image();
