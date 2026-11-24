@@ -23,8 +23,8 @@ header{display:flex;align-items:center;justify-content:space-between;padding:12p
 #dotsMenu button{display:block;width:100%;padding:12px;border:none;background:none;text-align:left;font-size:15px}
 main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin:70px auto 0 auto;padding:10px;padding-bottom:140px}
 .logo-wrap{text-align:center;margin:70px 0 20px 0}
-.logo-img{width:130px;height:130px;object-fit:cover;border-radius:50%;border:3px solid #f5d76e;box-shadow:0 6px 20px rgba(0,0,0,0.12)}
-.logo-text{font-size:22px;font-weight:bold;margin-top:10px}
+.logo-img{width:160px;height:160px;object-fit:cover;border-radius:50%;border:4px solid #f5c542;box-shadow:0 10px 25px rgba(0,0,0,0.18)}
+.logo-text{font-size:24px;font-weight:bold;margin-top:12px}
 .logo-sub{color:#888;font-size:14px}
 #chat{flex:1;display:flex;flex-direction:column;gap:12px;overflow-y:auto;padding-bottom:10px}
 .message{max-width:92%;padding:12px 14px;border-radius:18px;line-height:1.5;word-wrap:break-word}
@@ -69,9 +69,9 @@ main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin
 </header>
 <main>
 <div class="logo-wrap" id="logoWrap">
-<img class="logo-img" src="https://image.pollinations.ai/prompt/fresh%20uzbek%20non%20bread%20round%20golden%20crispy%20traditional%20uzbek%20lepeshka%20on%20white%20background%20professional%20food%20photography?width=400&height=400&seed=12345&nologo=true&model=flux" alt="Nonvoy AI - Non">
+<img class="logo-img" src="https://image.pollinations.ai/prompt/beautiful%20traditional%20Fergana%20Valley%20uzbek%20non%20bread%2C%20round%20golden%20crispy%20lepeshka%20with%20beautiful%20pattern%20in%20middle%2C%20fresh%20from%20tandir%2C%20on%20white%20background%2C%20professional%20food%20photography%2C%20very%20appetizing%2C%20warm%20light?width=600&height=600&seed=777&nologo=true&model=flux" alt="Vodiy Noni - Nonvoy AI">
 <div class="logo-text">Nonvoy AI</div>
-<div class="logo-sub">Matn + Rasm + Video — kerak bo'lsa chiqadi</div>
+<div class="logo-sub">Vodiy nonidek issiq va chiroyli ✨</div>
 </div>
 <div id="chat"></div>
 </main>
@@ -108,9 +108,19 @@ function addMessage(text,type){
   chat.scrollTop=chat.scrollHeight;
   return div;
 }
+function cleanReply(t){
+  t=t.replace(/```[\s\S]*?```/g,"");
+  t=t.replace(/`{1,3}/g,"");
+  t=t.replace(/\*\*/g,"");
+  t=t.replace(/!\[.*?\]\(.*?\)/g,"");
+  t=t.replace(/\[.*?\]\(.*?\)/g,"");
+  t=t.replace(/[.\-_\/\\|Y]{10,}/g,"");
+  return t.trim();
+}
 function shouldMakeImage(msg){
   const t=msg.toLowerCase().trim();
-  if(/(rasm|surat|foto|tasvir|chiz|yarat|ko'rsat|korsat|video|animatsiya|image|picture|draw|generate|chizib|yaratib)/.test(t)) return true;
+  if(/(rasm|surat|foto|tasvir|chiz|yarat|ko'rsat|korsat|video|animatsiya|image|picture|draw|generate|chizib|yaratib|ko'rsatib)/.test(t)) return true;
+  if(/(gul|g'unchak|gunchak|atirgul|lola|non|mushuk|it|kuchuk|mashina|uy|tog'|dengiz|qiz|bola|shahar|osmon|quyosh|oy|daraxt|at|qush|olma|kitob|telefon|robot|samolyot|poezd|kema|yomg'ir|qor|bog'|o'rmon|ko'l|tabiat|hayvon|qishloq|bozor)/.test(t)) return true;
   if(/^(salom|assalom|salomlar|hi|hello|hey|hayr|xayr|qalesan|qandaysan|yaxshimisan|yaxshi|rahmat|tushunarli|ha|yo'q|ok|okey)/.test(t)) return false;
   if(t.includes("?") || /(^|\s)(nima|qanday|nega|nima uchun|kim|qachon|qayerda|qayerga|qayerdan|nechta|necha|qaysi|qanaqa|tushuntir|ayt|yoz|hisobla|tarjima|yordam|maslahat|nima qilish|qanday qilish|bo'ladimi|mumkinmi|kerakmi)/.test(t)) return false;
   if(t.split(" ").length<=2) return false;
@@ -118,8 +128,9 @@ function shouldMakeImage(msg){
 }
 function translate(prompt){
   let e=prompt;
-  const dict={qizil:"red",mashina:"car",mushuk:"cat",it:"dog",uy:"house",gul:"flower",tog:"mountain",dengiz:"sea",qiz:"girl",bola:"boy",shahar:"city",osmon:"sky",quyosh:"sun",oy:"moon",daraxt:"tree",at:"horse",qush:"bird",olma:"apple",kitob:"book",telefon:"phone",kompyuter:"computer",robot:"robot",samolyot:"airplane",poezd:"train",kema:"ship",yomgir:"rain",qor:"snow"};
+  const dict={qizil:"red",mashina:"car",mushuk:"cat",it:"dog",uy:"house",gul:"flower",gunchak:"rosebud",tog:"mountain",dengiz:"sea",qiz:"girl",bola:"boy",shahar:"city",osmon:"sky",quyosh:"sun",oy:"moon",daraxt:"tree",at:"horse",qush:"bird",olma:"apple",kitob:"book",telefon:"phone",kompyuter:"computer",robot:"robot",samolyot:"airplane",poezd:"train",kema:"ship",yomgir:"rain",qor:"snow",non:"uzbek bread"};
   Object.keys(dict).forEach(k=>{ e=e.replace(new RegExp(k,"gi"),dict[k]); });
+  e=e.replace(/g'unchak/gi,"rosebud").replace(/g’unchak/gi,"rosebud");
   return "extremely sharp, crystal clear, high resolution, highly detailed, cinematic lighting, ultra realistic, 8k, professional photography, "+e+", sharp focus, detailed texture, vibrant colors";
 }
 function makeImageUrl(prompt){
@@ -184,11 +195,11 @@ async function send(){
     const response=await fetch("/api/chat",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({message:message,history:history})
+      body:JSON.stringify({message:message+" [Javobda ASCII rasm, kod blok, ``` ishlatma. Faqat oddiy o'zbekcha matn bilan javob ber.]",history:history})
     });
     const data=await response.json();
-    let reply=data.reply || "";
-    reply=reply.replace(/\*\*/g,"").replace(/!\[.*?\]\(.*?\)/g,"").replace(/\[.*?\]\(.*?\)/g,"");
+    let reply=cleanReply(data.reply || "");
+    if(!reply) reply="Mana, pastda rasmini tayyorladim.";
     box.textContent="";
     const h1=document.createElement("h3"); h1.textContent="💬 Matn"; box.appendChild(h1);
     const p=document.createElement("div"); p.textContent=reply; box.appendChild(p);
@@ -197,25 +208,4 @@ async function send(){
       const h2=document.createElement("h3"); h2.textContent="🖼️ Rasm"; box.appendChild(h2);
       const imgUrl=makeImageUrl(message);
       const img=document.createElement("img");
-      img.src=imgUrl;
-      const loading=document.createElement("div"); loading.textContent="Rasm tayyorlanmoqda..."; box.appendChild(loading);
-      img.onload=()=>{
-        loading.remove();
-        box.appendChild(img);
-        const dl=document.createElement("a"); dl.href=imgUrl; dl.download="nonvoy.png"; dl.textContent="Rasmni yuklab olish"; box.appendChild(dl);
-        const h3=document.createElement("h3"); h3.textContent="🎬 Video"; box.appendChild(h3);
-        const vload=document.createElement("div"); vload.textContent="Video tayyorlanmoqda..."; box.appendChild(vload);
-        setTimeout(()=>{ vload.remove(); makeVideoFromImage(imgUrl,box); },500);
-      };
-      img.onerror=()=>{ loading.textContent="Rasm chiqmadi, 45 soniya kutib qayta urinib ko'ring."; };
-    }
-  }catch(e){
-    box.textContent="Xatolik: Qayta urinib ko'ring.";
-  }
-  button.disabled=false;
-  input.focus();
-}
-input.addEventListener("keydown",function(e){ if(e.key==="Enter") send(); });
-</script>
-</body>
-</html>
+      img.src=img
