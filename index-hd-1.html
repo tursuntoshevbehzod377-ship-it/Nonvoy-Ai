@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nonvoy AI</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#0f172a;color:#fff;display:flex;flex-direction:column;min-height:100vh}
+header{padding:16px;text-align:center;font-weight:bold;font-size:20px;background:#020617}
+main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin:0 auto;padding:12px}
+.welcome{text-align:center;margin:20px 0}
+.welcome h1{margin:0;font-size:26px}
+.welcome p{color:#94a3b8}
+#chat{flex:1;display:flex;flex-direction:column;gap:10px;overflow-y:auto;padding-bottom:10px}
+.message{max-width:85%;padding:10px 14px;border-radius:14px;line-height:1.5;word-wrap:break-word}
+.message.user{background:#22c55e;color:#000;align-self:flex-end}
+.message.ai{background:#1e293b;align-self:flex-start}
+.message.ai img,.message.ai video,.message.ai canvas{width:100%;border-radius:12px;margin-top:8px}
+.message.ai a{color:#22c55e;display:block;margin-top:6px}
+.mode-bar{display:flex;gap:8px;margin-bottom:8px}
+.mode-btn{flex:1;padding:9px;border-radius:10px;border:none;background:#1e293b;color:#fff;font-weight:bold}
+.mode-btn.active{background:#22c55e;color:#000}
+.input-area{display:flex;gap:8px}
+#msg{flex:1;padding:12px;border-radius:12px;border:none;outline:none;background:#1e293b;color:#fff}
+#send{padding:12px 18px;border-radius:12px;border:none;background:#22c55e;font-weight:bold}
+footer{text-align:center;padding:10px;color:#64748b;font-size:13px}
+</style>
+</head>
+<body>
+<header>Nonvoy AI</header>
+<main>
+<div class="welcome">
+<h1>Men Nonvoy AI</h1>
+<p>Sizga qanday yordam bera olaman?</p>
+</div>
+<div id="chat"></div>
+<div class="mode-bar">
+<button class="mode-btn active" data-mode="text" onclick="setMode('text')">Matn</button>
+<button class="mode-btn" data-mode="image" onclick="setMode('image')">Rasm</button>
+<button class="mode-btn" data-mode="video" onclick="setMode('video')">Video</button>
+</div>
+<div class="input-area">
+<input id="msg" placeholder="Xabar yozing...">
+<button id="send" onclick="send()">Yuborish</button>
+</div>
+</main>
+<footer>Nonvoy AI © 2026</footer>
+<script>
+const chat=document.getElementById("chat");
+const input=document.getElementById("msg");
+const button=document.getElementById("send");
+let history=[];
+let currentMode="text";
+function setMode(m){
+  currentMode=m;
+  document.querySelectorAll(".mode-btn").forEach(b=>{
+    b.classList.toggle("active", b.dataset.mode===m);
+  });
+}
+function addMessage(text,type){
+  const div=document.createElement("div");
+  div.className="message "+type;
+  div.textContent=text;
+  chat.appendChild(div);
+  chat.scrollTop=chat.scrollHeight;
+  return div;
+}
+function translate(prompt){
+  let e=prompt;
+  const dict={qizil:"red",mashina:"car",mushuk:"cat",it:"dog",uy:"house",gul:"flower",tog:"mountain",dengiz:"sea",qiz:"woman",bola:"boy",shahar:"city",osmon:"sky",quyosh:"sun",oy:"moon",daraxt:"tree",at:"horse",qush:"bird",olma:"apple",kitob:"book",telefon:"phone",kompyuter:"computer",robot:"robot",samolyot:"airplane",poezd:"train",kema:"ship",yomgir:"rain",qor:"snow"};
+  Object.keys(dict).forEach(k=>{ e=e.replace(new RegExp(k,"gi"),dict[k]); });
+  return "photorealistic professional high-end DSLR photograph, natural realistic human face, sharp eyes, fine skin and hair details, crisp focus, detailed clothing texture, realistic hands, balanced natural lighting, rich but natural colors, clear detailed background, high quality, "+e;
+}
+function makeImageUrl(prompt){
+  const seed=Math.floor(Math.random()*999999);
+  return "https://image.pollinations.ai/prompt/"+encodeURIComponent(translate(prompt))+"?width=1024&height=1024&seed="+seed+"&nologo=true&model=flux&enhance=true";
+}
+function makeVideoFromImage(imgUrl,box){
+  const img=new Image();
+  img.crossOrigin="anonymous";
+  img.src=imgUrl;
+  img.onload=()=>{
+    const canvas=document.createElement("canvas");
+    canvas.width=640; canvas.height=640;
+    box.appendChild(canvas);
+    const ctx=canvas.getContext("2d");
+    const stream=canvas.captureStream(30);
+    const chunks=[];
+    const rec=new MediaRecorder(stream,{mimeType:"video/webm"});
+    rec.ondataavailable=e=>{ if(e.data.size>0) chunks.push(e.data); };
+    rec.onstop=()=>{
+      const blob=new Blob(chunks,{type:"video/webm"});
+      const url=URL.createObjectURL(blob);
+      const v=document.createElement("video");
+      v.src=url; v.controls=true; v.loop=true; v.autoplay=true;
+      box.appendChild(v);
+      const dl=document.createElement("a");
+      dl.href=url; dl.download="nonvoy-video.webm"; dl.textContent="Videoni yuklab olish";
+      box.appendChild(dl);
+    };
+    let start=performance.now();
+    rec.start();
+    function draw(now){
+      const t=(now-start)/5000;
+      if(t>=1){ rec.stop(); return; }
+      const zoom=1+t*0.35;
+      const w=640*zoom, h=640*zoom;
+      const x=(640-w)/2 + Math.sin(t*3)*20;
+      const y=(640-h)/2;
+      ctx.fillStyle="#000"; ctx.fillRect(0,0,640,640);
+      ctx.drawImage(img,x,y,w,h);
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  };
+  img.onerror=()=>{ box.textContent="Video yasalmadi, qayta urinib ko'ring."; };
+}
+async function send(){
+  const message=input.value.trim();
+  if(!message) return;
+  input.value="";
+  button.disabled=true;
+  addMessage(message,"user");
+  const low=message.toLowerCase();
+  const isImage = currentMode==="image" || low.includes("rasm chiz") || low.includes("rasmini chiz") || low.includes("chiz") || low.includes("draw") || low.includes("generate image");
+  const isVideo = currentMode==="video";
+  if(isVideo){
+    let prompt=message.replace(/video|rasm chiz|rasmini chiz|chiz|draw/gi,"").trim();
+    if(!prompt) prompt=message;
+    const box=addMessage("","ai");
+    box.textContent="Video tayyorlanmoqda... 5 soniya kuting";
+    const imgUrl=makeImageUrl(prompt);
+    box.textContent="";
+    makeVideoFromImage(imgUrl,box);
+    history.push({role:"user",content:message},{role:"assistant",content:"Video yaratildi: "+prompt});
+    button.disabled=false; input.focus(); return;
+  }
+  if(isImage){
+    let prompt=message.replace(/rasm chiz|rasmini chiz|chiz|draw|generate image/gi,"").trim();
+    if(!prompt) prompt=message;
+    const imgUrl=makeImageUrl(prompt);
+    const imgDiv=addMessage("","ai");
+    imgDiv.textContent="Rasm tayyorlanmoqda...";
+    const img=document.createElement("img");
+    img.src=imgUrl;
+    img.onload=()=>{ imgDiv.textContent=""; imgDiv.appendChild(img); const dl=document.createElement("a"); dl.href=imgUrl; dl.download="nonvoy.png"; dl.textContent="Yuklab olish"; imgDiv.appendChild(dl); };
+    img.onerror=()=>{ imgDiv.textContent="Rasm chiqmadi, qayta urinib ko'ring."; };
+    history.push({role:"user",content:message},{role:"assistant",content:"Rasm yaratildi: "+prompt});
+    button.disabled=false; input.focus(); return;
+  }
+  const loading=addMessage("Nonvoy AI yozmoqda...","ai");
+  try{
+    const response=await fetch("/api/chat",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({message:message,history:history})
+    });
+    const data=await response.json();
+    loading.textContent=data.reply || "Xatolik yuz berdi";
+    history.push({role:"user",content:message},{role:"assistant",content:data.reply});
+  }catch(e){
+    loading.textContent="Xatolik: Qayta urinib ko'ring. API keyni tekshiring.";
+  }
+  button.disabled=false;
+  input.focus();
+}
+input.addEventListener("keydown",function(e){ if(e.key==="Enter") send(); });
+button.addEventListener("click",send);
+</script>
+</body>
+</html>
