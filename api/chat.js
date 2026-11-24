@@ -8,7 +8,9 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Faqat POST so'rovi mumkin" });
+    return res.status(405).json({
+      reply: "Faqat POST so'rovi mumkin."
+    });
   }
 
   try {
@@ -17,7 +19,7 @@ export default async function handler(req, res) {
 
     if (!apiKey) {
       return res.status(500).json({
-        reply: "GEMINI_API_KEY kaliti Vercel'da topilmadi."
+        reply: "GEMINI_API_KEY kaliti topilmadi."
       });
     }
 
@@ -35,7 +37,8 @@ export default async function handler(req, res) {
 
     if (wantImage && !image) {
       const prompt = encodeURIComponent(
-        text + ", highly detailed, photorealistic, sharp focus, professional quality"
+        text +
+        ", photorealistic, highly detailed, sharp focus, professional photography, beautiful lighting"
       );
 
       const imageUrl =
@@ -49,7 +52,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // GEMINI UCHUN SO'ROV
+    // GEMINI UCHUN MA'LUMOT
     const parts = [];
 
     if (image) {
@@ -57,7 +60,9 @@ export default async function handler(req, res) {
       let mimeType = "image/jpeg";
 
       if (image.startsWith("data:")) {
-        const match = image.match(/^data:(.*?);base64,(.*)$/);
+        const match = image.match(
+          /^data:(.*?);base64,(.*)$/
+        );
 
         if (match) {
           mimeType = match[1];
@@ -67,7 +72,7 @@ export default async function handler(req, res) {
 
       parts.push({
         inlineData: {
-          mimeType,
+          mimeType: mimeType,
           data: base64
         }
       });
@@ -76,22 +81,22 @@ export default async function handler(req, res) {
         text:
           "Bu rasmni diqqat bilan tahlil qil. " +
           "Undagi narsalarni aniq tasvirla. " +
-          "Agar bilmasang, taxmin qilma. " +
-          "O'zbek tilida javob ber. Savol: " +
-          text
+          "Bilmagan narsangni o'ylab topma. " +
+          "O'zbek tilida javob ber. Savol: " + text
       });
     } else {
       parts.push({
         text:
           "Sen Nonvoy AI yordamchisisan. " +
-          "O'zbek tilida aniq va tushunarli javob ber.\n\n" +
+          "O'zbek tilida aniq, aqlli va tushunarli javob ber.\n\n" +
           text
       });
     }
 
+    // GEMINI 3.8 FLASH
     const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" +
-        encodeURIComponent(apiKey),
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=" +
+      encodeURIComponent(apiKey),
       {
         method: "POST",
         headers: {
@@ -101,7 +106,7 @@ export default async function handler(req, res) {
           contents: [
             {
               role: "user",
-              parts
+              parts: parts
             }
           ],
           generationConfig: {
@@ -116,8 +121,9 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       return res.status(response.status).json({
-        reply: "Gemini xatosi: " +
-          (data.error?.message || "So'rov bajarilmadi")
+        reply:
+          "Gemini xatosi: " +
+          (data.error?.message || "So'rov bajarilmadi.")
       });
     }
 
@@ -125,13 +131,15 @@ export default async function handler(req, res) {
       data.candidates?.[0]?.content?.parts
         ?.map(part => part.text || "")
         .join("") ||
-      "Kechirasiz, javob olinmadi.";
+      "Javob olinmadi.";
 
-    return res.status(200).json({ reply });
+    return res.status(200).json({
+      reply: reply
+    });
 
   } catch (error) {
     return res.status(500).json({
-      reply: "Xatolik yuz berdi: " + error.message
+      reply: "Xatolik: " + error.message
     });
   }
 }
