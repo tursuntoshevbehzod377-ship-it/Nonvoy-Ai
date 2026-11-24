@@ -6,77 +6,63 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ reply: 'Faqat POST' });
 
   try {
-    const { message, history, image } = req.body || {};
-    const userMsg = message || "Bu rasmni tahlil qilib ber";
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
+    const message = body.message || "Bu rasmni tahlil qilib ber";
+    const image = body.image || null;
     const apiKey = process.env.GROQ_API_KEY;
-    if (!apiKey) return res.status(200).json({ reply: "GROQ_API_KEY topilmadi. Vercel da tekshiring." });
+    if (!apiKey) return res.status(200).json({ reply: "XATO: GROQ_API_KEY topilmadi" });
 
-    // RASM BOR BO'LSA - KO'RA OLADIGAN MODEL
     if (image) {
-      const visionRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      // 1-urinish - Maverick
+      let r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + apiKey
-        },
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + apiKey },
         body: JSON.stringify({
           model: "meta-llama/llama-4-maverick-17b-128e-instruct",
           messages: [
-            {
-              role: "system",
-              content: "Sen Nonvoy AI san. O'zbek tilida javob ber. Rasmda nima ko'rsang - aniq ayt. Agar mashina bo'lsa: markasi, modeli, rangi, taxminiy yili, turi (sedan, SUV, sport...), o'ziga xos belgilari haqida ayt. Bilmasang - 'aniq bilmadim' de, lekin 'rasm juda chiroyli' deb qochma. Hech qachon 'rasm juda chiroyli' deb yozma."
-            },
-            {
-              role: "user",
-              content: [
-                { type: "text", text: userMsg },
-                { type: "image_url", image_url: { url: image } }
-              ]
-            }
+            { role: "system", content: "Sen Nonvoy AI san. O'zbek tilida javob ber. Rasmda nima ko'rsang aniq ayt. Agar mashina bo'lsa: markasi, modeli, rangi, turi haqida ayt. Hech qachon 'rasm juda chiroyli' dema." },
+            { role: "user", content: [{ type: "text", text: message }, { type: "image_url", image_url: { url: image } }] }
           ],
-          max_tokens: 1000,
-          temperature: 0.3
+          max_tokens: 1000, temperature: 0.3
         })
       });
+      let d = await r.json();
+      if (d.choices && d.choices[0]) return res.status(200).json({ reply: d.choices[0].message.content });
 
-      const visionData = await visionRes.json();
-      console.log("VISION:", JSON.stringify(visionData).slice(0, 500));
+      // 2-urinish - Scout, agar Maverick ishlamasa
+      let r2 = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + apiKey },
+        body: JSON.stringify({
+          model: "meta-llama/llama-4-scout-17b-16e-instruct",
+          messages: [
+            { role: "system", content: "Sen Nonvoy AI san. O'zbek tilida javob ber. Rasmda nima ko'rsang aniq ayt. Mashina bo'lsa markasi va modelini ayt." },
+            { role: "user", content: [{ type: "text", text: message }, { type: "image_url", image_url: { url: image } }] }
+          ],
+          max_tokens: 1000, temperature: 0.3
+        })
+      });
+      let d2 = await r2.json();
+      if (d2.choices && d2.choices[0]) return res.status(200).json({ reply: d2.choices[0].message.content });
 
-      if (visionData.choices && visionData.choices[0] && visionData.choices[0].message) {
-        return res.status(200).json({ reply: visionData.choices[0].message.content });
-      }
-
-      // Agar vision ishlamasa - xatoni ko'rsatamiz, yolg'on gapirmaymiz
-      return res.status(200).json({ reply: "Rasmni ko'ra olmadim. Yana bir bor yuborib ko'ring, iltimos. Xato: " + (visionData.error?.message || "noma'lum") });
+      return res.status(200).json({ reply: "RASM XATOSI: " + (d.error?.message || d2.error?.message || "model rasmni ko'ra olmadi") });
     }
 
-    // ODDIY MATN UCHUN - eski model
-    const textRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    // Oddiy matn
+    const tr = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + apiKey
-      },
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + apiKey },
       body: JSON.stringify({
         model: "openai/gpt-oss-120b",
-        messages: [
-          { role: "system", content: "Sen Nonvoy AI san. O'zbek tilida, qisqa va aniq javob ber." },
-          ...(history || []).slice(-10),
-          { role: "user", content: userMsg }
-        ],
-        max_tokens: 800,
-        temperature: 0.7
+        messages: [{ role: "system", content: "Sen Nonvoy AI san. O'zbek tilida javob ber." }, { role: "user", content: message }],
+        max_tokens: 800, temperature: 0.7
       })
     });
-
-    const textData = await textRes.json();
-    if (textData.choices && textData.choices[0]) {
-      return res.status(200).json({ reply: textData.choices[0].message.content });
-    }
-    return res.status(200).json({ reply: "Hozir javob bera olmadim. Qayta urinib ko'ring." });
+    const td = await tr.json();
+    if (td.choices && td.choices[0]) return res.status(200).json({ reply: td.choices[0].message.content });
+    return res.status(200).json({ reply: "MATN XATOSI: " + (td.error?.message || "javob kelmadi") });
 
   } catch (e) {
-    console.log("CHAT ERROR:", e.message);
-    return res.status(200).json({ reply: "Serverda xatolik. Bir ozdan keyin qayta urinib ko'ring." });
+    return res.status(200).json({ reply: "SERVER XATOSI: " + e.message });
   }
         }
