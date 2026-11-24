@@ -39,8 +39,7 @@ main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin
 #msg{flex:1;border:none;outline:none;font-size:17px;padding:10px;background:transparent}
 .plus-btn{width:42px;height:42px;min-width:42px;border-radius:50%;border:1px solid #ddd;background:#fff;font-size:24px;display:flex;align-items:center;justify-content:center}
 .instant-btn{border:1px solid #ddd;background:#fff;border-radius:999px;padding:8px 16px}
-.send-btn{width:48px;height:48px;min-width:48px;border-radius:50%;border:none;background:#111;color:#fff;font-size:22px;cursor:pointer;z-index:10}
-.send-btn:active{transform:scale(0.95)}
+.send-btn{width:48px;height:48px;min-width:48px;border-radius:50%;border:none;background:#111;color:#fff;font-size:22px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -70,7 +69,7 @@ main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin
 </header>
 <main>
 <div class="logo-wrap" id="logoWrap">
-<img class="logo-img" src="https://image.pollinations.ai/prompt/beautiful%20traditional%20Fergana%20Valley%20uzbek%20non%20bread%2C%20round%20golden%20crispy%20lepeshka%20with%20beautiful%20pattern%20in%20middle%2C%20fresh%20from%20tandir%2C%20on%20white%20background%2C%20professional%20food%20photography%2C%20very%20appetizing%2C%20warm%20light?width=600&height=600&seed=777&nologo=true&model=flux" alt="Vodiy Noni - Nonvoy AI">
+<img class="logo-img" src="https://image.pollinations.ai/prompt/beautiful%20traditional%20Fergana%20Valley%20uzbek%20non%20bread%2C%20round%20golden%20crispy%20lepeshka%20with%20beautiful%20pattern%20in%20middle%2C%20fresh%20from%20tandir%2C%20on%20white%20background%2C%20professional%20food%20photography%2C%20very%20appetizing%2C%20warm%20light?width=600&height=600&seed=777&nologo=true&model=flux" alt="Vodiy Noni">
 <div class="logo-text">Nonvoy AI</div>
 <div class="logo-sub">Vodiy nonidek issiq va chiroyli ✨</div>
 </div>
@@ -111,20 +110,23 @@ function addMessage(text,type){
   return div;
 }
 function cleanReply(t){
-  t=t.replace(/```[\s\S]*?```/g,"");
-  t=t.replace(/`{1,3}/g,"");
-  t=t.replace(/\*\*/g,"");
-  t=t.replace(/!\[.*?\]\(.*?\)/g,"");
-  t=t.replace(/\[.*?\]\(.*?\)/g,"");
+  t=t.replace(/```[\s\S]*?```/g,"").replace(/`{1,3}/g,"").replace(/\*\*/g,"").replace(/!\[.*?\]\(.*?\)/g,"").replace(/\[.*?\]\(.*?\)/g,"");
   return t.trim();
+}
+function localReply(msg){
+  var t=msg.toLowerCase().trim();
+  if(t.indexOf("salom")===0 || t.indexOf("assalom")===0) return "Salom! Qandaysiz? Men Nonvoy AI man. Nima yordam beray? Rasm chizishimni xohlaysizmi yoki savolingiz bormi?";
+  if(t.indexOf("qalesan")>=0 || t.indexOf("qandaysan")>=0) return "Yaxshi, rahmat! Siz qandaysiz? Nima yordam beray?";
+  if(t.indexOf("rahmat")>=0) return "Arzimaydi! Yana savolingiz bo'lsa yozing.";
+  if(t.indexOf("kim")>=0 && t.indexOf("sen")>=0) return "Men Nonvoy AI man — Vodiy nonidek issiq yordamchi. Matn yozaman, rasm chizaman, video qilaman.";
+  return "";
 }
 function shouldMakeImage(msg){
   var t=msg.toLowerCase().trim();
-  if(t.indexOf("rasm")>=0 || t.indexOf("surat")>=0 || t.indexOf("foto")>=0 || t.indexOf("tasvir")>=0 || t.indexOf("chiz")>=0 || t.indexOf("yarat")>=0 || t.indexOf("video")>=0 || t.indexOf("animatsiya")>=0) return true;
-  if(t.indexOf("gul")>=0 || t.indexOf("gunchak")>=0 || t.indexOf("non")>=0 || t.indexOf("mushuk")>=0 || t.indexOf("mashina")>=0 || t.indexOf("uy")>=0 || t.indexOf("tog")>=0 || t.indexOf("dengiz")>=0 || t.indexOf("daraxt")>=0 || t.indexOf("qush")>=0) return true;
-  if(t.indexOf("salom")===0 || t.indexOf("assalom")===0 || t.indexOf("hi")===0 || t.indexOf("hello")===0 || t.indexOf("rahmat")===0) return false;
+  if(t.indexOf("rasm")>=0 || t.indexOf("surat")>=0 || t.indexOf("foto")>=0 || t.indexOf("tasvir")>=0 || t.indexOf("chiz")>=0 || t.indexOf("yarat")>=0 || t.indexOf("video")>=0) return true;
+  if(t.indexOf("gul")>=0 || t.indexOf("gunchak")>=0 || t.indexOf("non")>=0 || t.indexOf("mushuk")>=0 || t.indexOf("mashina")>=0 || t.indexOf("daraxt")>=0 || t.indexOf("qush")>=0) return true;
+  if(t.indexOf("salom")===0 || t.indexOf("assalom")===0 || t.indexOf("rahmat")===0) return false;
   if(t.indexOf("?")>=0) return false;
-  if(t.indexOf("nima")>=0 || t.indexOf("qanday")>=0 || t.indexOf("nega")>=0 || t.indexOf("kim")>=0 || t.indexOf("qachon")>=0 || t.indexOf("qayerda")>=0 || t.indexOf("tushuntir")>=0 || t.indexOf("tarjima")>=0) return false;
   return false;
 }
 function translate(prompt){
@@ -177,6 +179,22 @@ function makeVideoFromImage(imgUrl,box){
     requestAnimationFrame(draw);
   };
 }
+function showImageVideo(message,box){
+  var h2=document.createElement("h3"); h2.textContent="🖼️ Rasm"; box.appendChild(h2);
+  var imgUrl=makeImageUrl(message);
+  var img=document.createElement("img");
+  img.src=imgUrl;
+  var loading=document.createElement("div"); loading.textContent="Rasm tayyorlanmoqda..."; box.appendChild(loading);
+  img.onload=function(){
+    loading.remove();
+    box.appendChild(img);
+    var dl=document.createElement("a"); dl.href=imgUrl; dl.download="nonvoy.png"; dl.textContent="Rasmni yuklab olish"; box.appendChild(dl);
+    var h3=document.createElement("h3"); h3.textContent="🎬 Video"; box.appendChild(h3);
+    var vload=document.createElement("div"); vload.textContent="Video tayyorlanmoqda..."; box.appendChild(vload);
+    setTimeout(function(){ vload.remove(); makeVideoFromImage(imgUrl,box); },500);
+  };
+  img.onerror=function(){ loading.textContent="Rasm chiqmadi, 45 soniya kutib qayta urinib koring."; };
+}
 async function send(){
   if(isSending) return;
   var message=input.value.trim();
@@ -186,38 +204,26 @@ async function send(){
   addMessage(message,"user");
   var box=addMessage("","ai");
   box.textContent="Tayyorlanmoqda...";
+  var reply="";
   try{
     var response=await fetch("/api/chat",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({message:message+" [Javobda ASCII rasm, kod blok ishlatma. Faqat oddiy ozbekcha matn bilan javob ber.]",history:history})
+      body:JSON.stringify({message:message,history:history})
     });
     var data=await response.json();
-    var reply=cleanReply(data.reply || "");
-    if(!reply) reply="Mana, pastda rasmini tayyorladim.";
-    box.textContent="";
-    var h1=document.createElement("h3"); h1.textContent="💬 Matn"; box.appendChild(h1);
-    var p=document.createElement("div"); p.textContent=reply; box.appendChild(p);
-    history.push({role:"user",content:message},{role:"assistant",content:reply});
-    if(shouldMakeImage(message)){
-      var h2=document.createElement("h3"); h2.textContent="🖼️ Rasm"; box.appendChild(h2);
-      var imgUrl=makeImageUrl(message);
-      var img=document.createElement("img");
-      img.src=imgUrl;
-      var loading=document.createElement("div"); loading.textContent="Rasm tayyorlanmoqda..."; box.appendChild(loading);
-      img.onload=function(){
-        loading.remove();
-        box.appendChild(img);
-        var dl=document.createElement("a"); dl.href=imgUrl; dl.download="nonvoy.png"; dl.textContent="Rasmni yuklab olish"; box.appendChild(dl);
-        var h3=document.createElement("h3"); h3.textContent="🎬 Video"; box.appendChild(h3);
-        var vload=document.createElement("div"); vload.textContent="Video tayyorlanmoqda..."; box.appendChild(vload);
-        setTimeout(function(){ vload.remove(); makeVideoFromImage(imgUrl,box); },500);
-      };
-      img.onerror=function(){ loading.textContent="Rasm chiqmadi, 45 soniya kutib qayta urinib koring."; };
-    }
-  }catch(e){
-    box.textContent="Xatolik: Internetni tekshirib qayta urinib koring.";
+    reply=cleanReply(data.reply || "");
+  }catch(e){ reply=""; }
+  if(!reply || reply.indexOf("server band")>=0){
+    var local=localReply(message);
+    if(local) reply=local;
+    else if(!reply) reply="Hozir server band, lekin men shu yerdaman. Birozdan keyin qayta urinib koring.";
   }
+  box.textContent="";
+  var h1=document.createElement("h3"); h1.textContent="💬 Matn"; box.appendChild(h1);
+  var p=document.createElement("div"); p.textContent=reply; box.appendChild(p);
+  history.push({role:"user",content:message},{role:"assistant",content:reply});
+  if(shouldMakeImage(message)) showImageVideo(message,box);
   isSending=false;
   input.focus();
 }
