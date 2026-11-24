@@ -10,7 +10,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #eee;position:sticky;top:0;background:#fff;z-index:10}
 .left{display:flex;align-items:center;gap:10px}
 .menu{font-size:26px;cursor:pointer;border:none;background:none}
-.logo{width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #e8a400;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.logo{width:48px;height:48px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 2px #e8a400}
 h1{font-size:22px}
 .dots{font-size:26px;border:none;background:none;cursor:pointer}
 #chat{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px;padding-bottom:20px}
@@ -18,7 +18,6 @@ h1{font-size:22px}
 .me{align-self:flex-end;background:#d3f8d3}
 .ai{align-self:flex-start;background:#f1f1f1}
 .bubble img{width:100%;border-radius:12px;margin-top:10px;display:block;max-height:400px;object-fit:cover}
-.bubble video{width:100%;border-radius:12px;margin-top:10px}
 .label{font-weight:700;margin-bottom:6px;font-size:14px}
 .label.green{color:#0a7a2a}
 .ask-box{background:#fff7d6;border:1px solid #f5d76e;padding:12px;border-radius:14px}
@@ -44,8 +43,8 @@ footer{padding:10px 12px 14px;border-top:1px solid #eee;background:#fff}
 
 <header>
   <div class="left">
-    <button class="menu" onclick="alert('Nonvoy AI\n\nMatn yozing, rasm so\'rang, rasm yuborib tahlil qildiring.')">☰</button>
-    <img class="logo" src="logo.jpg" alt="Vodiy noni" onerror="this.outerHTML='🍞'">
+    <button class="menu" onclick="alert('Nonvoy AI')">☰</button>
+    <svg class="logo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#e8a400"/><circle cx="50" cy="50" r="44" fill="#f5b301"/><circle cx="50" cy="50" r="36" fill="#f9c83a"/><circle cx="50" cy="50" r="16" fill="#c98a00"/><circle cx="50" cy="50" r="16" fill="none" stroke="#8a5a00" stroke-width="1" stroke-dasharray="3 3"/><g stroke="#8a5a00" stroke-width="2" fill="none"><path d="M50 14 L50 30 M50 70 L50 86 M14 50 L30 50 M70 50 L86 50 M25 25 L36 36 M64 64 L75 75 M75 25 L64 36 M36 64 L25 75"/><circle cx="50" cy="50" r="8" fill="#a06a00"/></g><g fill="#3a2400"><circle cx="42" cy="42" r="1.5"/><circle cx="58" cy="42" r="1.5"/><circle cx="42" cy="58" r="1.5"/><circle cx="58" cy="58" r="1.5"/><circle cx="50" cy="34" r="1.5"/><circle cx="50" cy="66" r="1.5"/></g></svg>
     <h1>Nonvoy AI</h1>
   </div>
   <button class="dots" onclick="if(confirm('Chatni tozalashni xohlaysizmi?')){document.getElementById('chat').innerHTML='';localStorage.removeItem('nonvoy_chat');}">⋮</button>
@@ -55,12 +54,12 @@ footer{padding:10px 12px 14px;border-top:1px solid #eee;background:#fff}
 
 <div class="preview-box" id="previewBox">
   <img id="previewImg" src="">
-  <span>✅ Rasm tayyor — endi savol yozing: "Bu rasmda nima bor?"</span>
+  <span>✅ Rasm tayyor — endi savol yozing</span>
 </div>
 
 <footer>
   <div class="input-wrap">
-    <button id="plus" title="Rasm yuborish">+</button>
+    <button id="plus">+</button>
     <input id="inp" placeholder="Xabar yozing..." autocomplete="off">
     <button id="send">↑</button>
   </div>
@@ -73,37 +72,56 @@ footer{padding:10px 12px 14px;border-top:1px solid #eee;background:#fff}
 <input type="file" id="fileInput" accept="image/*">
 
 <script>
-let waitingForImageSubject = false;
-let videoMode = false;
-let pendingImageData = null;
-const chatEl = document.getElementById('chat');
-const inp = document.getElementById('inp');
-function setMode(m){ videoMode=(m==='video'); document.getElementById('modeRasm').classList.toggle('on',!videoMode); document.getElementById('modeVideo').classList.toggle('on',videoMode); }
-function addBubble(text, who, isHtml){ const d=document.createElement('div'); d.className='bubble '+(who==='me'?'me':'ai'); if(isHtml) d.innerHTML=text; else d.textContent=text; chatEl.appendChild(d); chatEl.scrollTop=chatEl.scrollHeight; return d; }
-function saveChat(){ try{ localStorage.setItem('nonvoy_chat', chatEl.innerHTML); }catch(e){} }
-const saved = localStorage.getItem('nonvoy_chat');
-if(saved) chatEl.innerHTML=saved; else addBubble('Salom! Qanday yordam bera olaman?','ai');
-const dict={'qizil':'red','qiz':'girl','bola':'child','bolani':'girl','mashina':'car','gul':'flower',"g'unchak":'rose bud',"g'unchak gul":'rose bud','tog':'mountain','dengiz':'sea','ot':'horse','mushuk':'cat','it':'dog','uy':'house','qush':'bird','olma':'apple'};
-function translateUzToEn(t){ let s=' '+t.toLowerCase()+' '; for(const k in dict){ s=s.split(k).join(dict[k]); } return s.trim(); }
-function isVagueImageRequest(t){ const s=t.toLowerCase().trim(); const vague=['rasm chizib ber','rasm chiz','rasm yasab ber','rasm yasab','rasm chizib','rasm kerak','rasm','rasm chizib bering','rasm chizib berchi','rasm yarat','rasm yaratib ber','chizib ber','rasm chiqarib ber']; if(vague.includes(s)) return true; if(s.startsWith('rasm chizib ber') && s.replace('rasm chizib ber','').trim().length<2) return true; return false; }
-function isImageRequest(t){ const s=t.toLowerCase(); return s.includes('rasm')||s.includes('chiz')||s.includes('surat')||s.includes('kartina'); }
-function askWhatImage(){ waitingForImageSubject=true; addBubble(`<div class="label green">💬 Matn</div><div class="ask-box"><b>Qanaqa rasm chizib beray? 🤔</b><br><br>Mavzuni yozing. Masalan:</div><div class="chips"><button class="chip" onclick="pickSubject('Qizil mashina')">🚗 Qizil mashina</button><button class="chip" onclick="pickSubject('Gul')">🌹 Gul</button><button class="chip" onclick="pickSubject('Tog manzarasi')">🏔️ Tog' manzarasi</button><button class="chip" onclick="pickSubject('Mushuk')">🐱 Mushuk</button></div>`,'ai',true); saveChat(); }
-function pickSubject(subject){ inp.value=subject; sendMessage(); }
-async function sendMessage(){
-  const text=inp.value.trim(); if(!text && !pendingImageData) return;
-  if(pendingImageData){ const imgData=pendingImageData; pendingImageData=null; document.getElementById('previewBox').style.display='none'; addBubble('','me',true).innerHTML=(text?escapeHtml(text)+'<br>':'')+'<img src="'+imgData+'">'; inp.value=''; const b=addBubble('🔍 Rasm tahlili\n\nTahlil qilinyapti...','ai'); try{ const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text||'Bu rasmda nima bor?',image:imgData})}); const d=await r.json(); b.innerHTML='<div class="label green">🔍 Rasm tahlili</div>'+escapeHtml(d.reply||d.error||'Xato'); }catch(e){ b.textContent='Xato: '+e.message; } saveChat(); return; }
-  if(waitingForImageSubject && text){ waitingForImageSubject=false; addBubble(text,'me'); inp.value=''; generateImage(text); return; }
-  addBubble(text,'me'); inp.value='';
-  if(isVagueImageRequest(text)){ askWhatImage(); saveChat(); return; }
-  if(isImageRequest(text)){ generateImage(text); return; }
-  const b=addBubble('Yozilyapti...','ai'); try{ const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})}); const d=await r.json(); b.innerHTML='<div class="label green">💬 Matn</div>'+escapeHtml(d.reply||d.error||'Xato'); }catch(e){ b.textContent='Xato: '+e.message; } saveChat();
+let waitingForImageSubject=false,videoMode=false,pendingImageData=null;
+const chatEl=document.getElementById('chat'),inp=document.getElementById('inp');
+function setMode(m){videoMode=(m==='video');document.getElementById('modeRasm').classList.toggle('on',!videoMode);document.getElementById('modeVideo').classList.toggle('on',videoMode);}
+function addBubble(text,who,isHtml){const d=document.createElement('div');d.className='bubble '+(who==='me'?'me':'ai');if(isHtml)d.innerHTML=text;else d.textContent=text;chatEl.appendChild(d);chatEl.scrollTop=chatEl.scrollHeight;return d;}
+function saveChat(){try{localStorage.setItem('nonvoy_chat',chatEl.innerHTML);}catch(e){}}
+const saved=localStorage.getItem('nonvoy_chat');
+if(saved)chatEl.innerHTML=saved;else addBubble('Salom! Qanday yordam bera olaman?','ai');
+const dict={'qizil':'red','qiz':'girl','mashina':'car','gul':'flower',"g'unchak":'rose bud','tog':'mountain','dengiz':'sea','ot':'horse','mushuk':'cat','it':'dog','uy':'house','qush':'bird','olma':'apple','non':'bread'};
+function translateUzToEn(t){let s=' '+t.toLowerCase()+' ';for(const k in dict){s=s.split(k).join(dict[k]);}return s.trim();}
+
+// ✅ YANGI QOIDA: Savol bo'lsa - rasm chizmaydi, matn bilan javob beradi
+function isQuestion(t){
+  const s=t.toLowerCase().trim();
+  return s.startsWith('nimani')||s.startsWith('nima')||s.startsWith('qanaqa')||s.startsWith('qanday')||s.startsWith('kim')||s.startsWith('qayer')||s.startsWith('qachon')||s.startsWith('necha')||s.includes('ko\'rayapsan')||s.includes('ko\'ryapsan')||s.includes('?');
 }
-function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-async function generateImage(promptUz){ const promptEn=translateUzToEn(promptUz.replace(/rasm.*chiz.*/i,'').replace(/rasmini/i,'').trim()||promptUz); const b=addBubble('🖼️ Rasm\n\nRasm tayyorlanyapti...','ai'); const seed=Math.floor(Math.random()*999999); const url='https://image.pollinations.ai/prompt/'+encodeURIComponent('Beautiful, sharp, cinematic, high quality photo, '+promptEn)+'?width=1024&height=1024&seed='+seed+'&nologo=true'; const img=new Image(); img.onload=()=>{ b.innerHTML='<div class="label green">🖼️ Rasm</div>Mana, rasmingizni tayyorladim!<br><img src="'+url+'">'; saveChat(); }; img.onerror=()=>{ b.innerHTML='Rasm yuklanmadi. 45 soniyadan keyin qayta urinib ko\'ring.'; saveChat(); }; img.src=url; }
+function isVagueImageRequest(t){
+  const s=t.toLowerCase().trim();
+  const v=['rasm chizib ber','rasm chiz','rasm yasab ber','rasm yasab','rasm chizib','rasm kerak','rasm','rasm chizib bering','rasm yarat','rasm yaratib ber','chizib ber','rasm chiqarib ber'];
+  if(v.includes(s))return true;
+  if(s.startsWith('rasm chizib ber')&&s.replace('rasm chizib ber','').trim().length<2)return true;
+  return false;
+}
+// ✅ FAQAT chizish buyrug'i bo'lsa - rasm chizadi
+function isImageRequest(t){
+  const s=t.toLowerCase();
+  // "chizib ber", "yasab ber", "yaratib ber" bo'lsa - chizish
+  if(s.includes('chiz')||s.includes('yasab ber')||s.includes('yaratib ber')||s.includes('chizib')) return true;
+  // "Qizil mashina rasmi" - mavzu + rasmi bo'lsa ham chizish
+  if(s.includes('rasmi')&&!isQuestion(t)) return true;
+  if(s.includes('rasmini')&&!isQuestion(t)) return true;
+  return false;
+}
+function askWhatImage(){waitingForImageSubject=true;addBubble(`<div class="label green">💬 Matn</div><div class="ask-box"><b>Qanaqa rasm chizib beray? 🤔</b><br><br>Mavzuni yozing.</div><div class="chips"><button class="chip" onclick="pickSubject('Qizil mashina')">🚗 Qizil mashina</button><button class="chip" onclick="pickSubject('Gul')">🌹 Gul</button><button class="chip" onclick="pickSubject('Tog manzarasi')">🏔️ Tog' manzarasi</button><button class="chip" onclick="pickSubject('Mushuk')">🐱 Mushuk</button></div>`,'ai',true);saveChat();}
+function pickSubject(s){inp.value=s;sendMessage();}
+async function sendMessage(){
+  const text=inp.value.trim();if(!text&&!pendingImageData)return;
+  if(pendingImageData){const imgData=pendingImageData;pendingImageData=null;document.getElementById('previewBox').style.display='none';addBubble('','me',true).innerHTML=(text?escapeHtml(text)+'<br>':'')+'<img src="'+imgData+'">';inp.value='';const b=addBubble('🔍 Rasm tahlili\n\nTahlil qilinyapti...','ai');try{const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text||'Bu rasmda nima bor?',image:imgData})});const d=await r.json();b.innerHTML='<div class="label green">🔍 Rasm tahlili</div>'+escapeHtml(d.reply||d.error||'Xato');}catch(e){b.textContent='Xato: '+e.message;}saveChat();return;}
+  if(waitingForImageSubject&&text){waitingForImageSubject=false;addBubble(text,'me');inp.value='';generateImage(text);return;}
+  addBubble(text,'me');inp.value='';
+  if(isVagueImageRequest(text)){askWhatImage();saveChat();return;}
+  if(isImageRequest(text)){generateImage(text);return;}
+  // Savol / oddiy matn - OpenRouter ga yuboradi, rasm chizmaydi
+  const b=addBubble('Yozilyapti...','ai');try{const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});const d=await r.json();b.innerHTML='<div class="label green">💬 Matn</div>'+escapeHtml(d.reply||d.error||'Xato');}catch(e){b.textContent='Xato: '+e.message;}saveChat();
+}
+function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+async function generateImage(promptUz){const promptEn=translateUzToEn(promptUz.replace(/rasm.*chiz.*/i,'').replace(/rasmini/i,'').replace(/rasmi/i,'').trim()||promptUz);const b=addBubble('🖼️ Rasm\n\nRasm tayyorlanyapti...','ai');const seed=Math.floor(Math.random()*999999);const url='https://image.pollinations.ai/prompt/'+encodeURIComponent('Beautiful, sharp, cinematic, high quality photo, '+promptEn)+'?width=1024&height=1024&seed='+seed+'&nologo=true';const img=new Image();img.onload=()=>{b.innerHTML='<div class="label green">🖼️ Rasm</div>Mana, rasmingizni tayyorladim!<br><img src="'+url+'">';saveChat();};img.onerror=()=>{b.innerHTML='Rasm yuklanmadi. 45 soniyadan keyin qayta urinib ko\'ring.';saveChat();};img.src=url;}
 document.getElementById('send').onclick=sendMessage;
-inp.addEventListener('keydown',e=>{ if(e.key==='Enter') sendMessage(); });
+inp.addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
 document.getElementById('plus').onclick=()=>document.getElementById('fileInput').click();
-document.getElementById('fileInput').onchange=(e)=>{ const f=e.target.files[0]; if(!f) return; const rd=new FileReader(); rd.onload=()=>{ pendingImageData=rd.result; document.getElementById('previewImg').src=rd.result; document.getElementById('previewBox').style.display='flex'; inp.placeholder='Bu rasmda nima bor? deb yozing...'; inp.focus(); }; rd.readAsDataURL(f); e.target.value=''; };
+document.getElementById('fileInput').onchange=(e)=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{pendingImageData=rd.result;document.getElementById('previewImg').src=rd.result;document.getElementById('previewBox').style.display='flex';inp.placeholder='Bu rasmda nima bor? deb yozing...';inp.focus();};rd.readAsDataURL(f);e.target.value='';};
 </script>
 </body>
 </html>
