@@ -21,7 +21,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:12p
 #dotsMenu{position:fixed;top:60px;right:14px;background:#fff;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,0.15);padding:8px;display:none;z-index:99;width:180px}
 #dotsMenu.show{display:block}
 #dotsMenu button{display:block;width:100%;padding:12px;border:none;background:none;text-align:left;font-size:15px}
-main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin:70px auto 0 auto;padding:10px;padding-bottom:150px}
+main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin:70px auto 0 auto;padding:10px;padding-bottom:170px}
 .logo-wrap{text-align:center;margin:70px 0 20px 0}
 .logo-img{width:160px;height:160px;object-fit:cover;border-radius:50%;border:4px solid #f5c542;box-shadow:0 10px 25px rgba(0,0,0,0.18)}
 .logo-text{font-size:24px;font-weight:bold;margin-top:12px}
@@ -30,7 +30,7 @@ main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin
 .message{max-width:92%;padding:12px 14px;border-radius:18px;line-height:1.5;word-wrap:break-word}
 .message.user{background:#e8f5e9;align-self:flex-end}
 .message.ai{background:#f1f1f1;align-self:flex-start}
-.message.ai img,.message.ai video,.message.ai canvas{width:100%;border-radius:14px;margin-top:10px}
+.message img,.message video,.message canvas{width:100%;border-radius:14px;margin-top:10px}
 .message.ai a{color:#0a7a42;display:block;margin-top:6px}
 .message.ai h3{margin:10px 0 4px 0;font-size:15px;color:#0a7a42}
 .bottom-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:10px 12px 16px 12px;z-index:50}
@@ -42,6 +42,9 @@ main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin
 .mode-btn.active{background:#111;color:#fff;border-color:#111}
 .send-btn{width:48px;height:48px;min-width:48px;border-radius:50%;border:none;background:#111;color:#fff;font-size:22px;cursor:pointer}
 .hint{font-size:12px;color:#888;text-align:center;margin-top:4px}
+#previewBox{display:none;position:relative;margin-top:8px}
+#previewBox img{width:90px;height:90px;object-fit:cover;border-radius:12px}
+#removeImg{position:absolute;top:-8px;left:82px;width:26px;height:26px;border-radius:50%;border:none;background:#111;color:#fff;font-size:14px}
 </style>
 </head>
 <body>
@@ -80,17 +83,23 @@ main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin
 <div class="bottom-bar">
 <div class="input-box">
 <div class="input-row">
-<input id="msg" placeholder="Ask Nonvoy AI..." autocomplete="off">
+<input id="msg" placeholder="Ask Nonvoy AI... yoki rasm yuborib so'rang" autocomplete="off">
+</div>
+<div id="previewBox">
+<img id="previewImg" src="">
+<button type="button" id="removeImg">✕</button>
+<div style="font-size:12px;color:#0a7a42;margin-top:2px">✅ Rasm tanlandi — savol yozib yuboring</div>
 </div>
 <div class="input-row" style="justify-content:space-between;margin-top:8px">
-<button type="button" class="plus-btn" onclick="alert('Rasm yuklash tez orada')">+</button>
+<button type="button" class="plus-btn" id="plusBtn">+</button>
+<input type="file" id="fileInput" accept="image/*" style="display:none">
 <div style="display:flex;gap:6px;align-items:center">
 <button type="button" id="imgBtn" class="mode-btn">🖼️ Rasm</button>
 <button type="button" id="vidBtn" class="mode-btn">🎬 Video</button>
 <button type="button" id="sendBtn" class="send-btn">↑</button>
 </div>
 </div>
-<div class="hint" id="hint">Matn rejimi — faqat yozib javob beradi</div>
+<div class="hint" id="hint">+ ni bosib rasm yuboring — tahlil qilib beradi</div>
 </div>
 <div style="text-align:center;color:#aaa;font-size:12px;margin-top:6px">Nonvoy AI © 2026</div>
 </div>
@@ -104,18 +113,36 @@ var hint=document.getElementById("hint");
 var history=[];
 var wantImage=false;
 var wantVideo=false;
+var selectedImage=null;
 function openSidebar(){ document.getElementById("sidebar").classList.add("open"); document.getElementById("overlay").classList.add("show"); }
 function toggleDots(){ document.getElementById("dotsMenu").classList.toggle("show"); }
 function closeAll(){ document.getElementById("sidebar").classList.remove("open"); document.getElementById("overlay").classList.remove("show"); document.getElementById("dotsMenu").classList.remove("show"); }
-function newChat(){ chat.innerHTML=""; document.getElementById("logoWrap").style.display="block"; history=[]; closeAll(); }
+function newChat(){ chat.innerHTML=""; document.getElementById("logoWrap").style.display="block"; history=[]; selectedImage=null; document.getElementById("previewBox").style.display="none"; closeAll(); }
 function updateHint(){
-  if(wantImage && wantVideo) hint.textContent="Rasm + Video rejimi — rasm va video ham chiqadi";
+  if(selectedImage) hint.textContent="Rasm tanlandi — savol yozib yuboring";
+  else if(wantImage && wantVideo) hint.textContent="Rasm + Video rejimi";
   else if(wantImage) hint.textContent="Rasm rejimi — rasm ham chiqadi";
   else if(wantVideo) hint.textContent="Video rejimi — video ham chiqadi";
-  else hint.textContent="Matn rejimi — faqat yozib javob beradi";
+  else hint.textContent="+ ni bosib rasm yuboring — tahlil qilib beradi";
 }
 imgBtn.addEventListener("click",function(){ wantImage=!wantImage; imgBtn.classList.toggle("active",wantImage); updateHint(); input.focus(); });
 vidBtn.addEventListener("click",function(){ wantVideo=!wantVideo; vidBtn.classList.toggle("active",wantVideo); if(wantVideo){ wantImage=true; imgBtn.classList.add("active"); } updateHint(); input.focus(); });
+document.getElementById("plusBtn").addEventListener("click",function(){ document.getElementById("fileInput").click(); });
+document.getElementById("fileInput").addEventListener("change",function(e){
+  var f=e.target.files[0]; if(!f) return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    selectedImage=ev.target.result;
+    document.getElementById("previewImg").src=selectedImage;
+    document.getElementById("previewBox").style.display="block";
+    input.placeholder="Bu rasm haqida nima so'raysiz?";
+    input.focus(); updateHint();
+  };
+  reader.readAsDataURL(f);
+});
+document.getElementById("removeImg").addEventListener("click",function(){
+  selectedImage=null; document.getElementById("previewBox").style.display="none"; document.getElementById("fileInput").value=""; input.placeholder="Ask Nonvoy AI... yoki rasm yuborib so'rang"; updateHint();
+});
 function addMessage(text,type){
   document.getElementById("logoWrap").style.display="none";
   var div=document.createElement("div");
@@ -128,15 +155,6 @@ function addMessage(text,type){
 function cleanReply(t){
   t=t.replace(/```[\s\S]*?```/g,"").replace(/`{1,3}/g,"").replace(/\*\*/g,"").replace(/!\[.*?\]\(.*?\)/g,"").replace(/\[.*?\]\(.*?\)/g,"");
   return t.trim();
-}
-function localReply(msg,doImage){
-  var t=msg.toLowerCase().trim();
-  if(doImage) return "Mana, rasmingizni tayyorladim! Pastda ko'ring.";
-  if(t.indexOf("salom")===0 || t.indexOf("assalom")===0) return "Salom! Qandaysiz? Men Nonvoy AI man.";
-  if(t.indexOf("qalesan")>=0 || t.indexOf("qandaysan")>=0) return "Yaxshi, rahmat! Siz qandaysiz?";
-  if(t.indexOf("rahmat")>=0) return "Arzimaydi!";
-  if(t.indexOf("kim")>=0 && t.indexOf("sen")>=0) return "Men Nonvoy AI man — Vodiy nonidek issiq yordamchi.";
-  return "Tushundim. Hozir server biroz band, lekin ishingizni qildim.";
 }
 function shouldMakeImage(msg){
   if(wantImage || wantVideo) return true;
@@ -157,6 +175,21 @@ function translate(prompt){
 }
 function makeImageUrl(prompt){
   return "https://image.pollinations.ai/prompt/"+encodeURIComponent(translate(prompt))+"?width=1024&height=1024&seed="+Math.floor(Math.random()*999999)+"&nologo=true&model=flux";
+}
+function downloadImage(url,box){
+  var a=document.createElement("a");
+  a.textContent="⬇️ Rasmni yuklab olish";
+  a.href="#";
+  a.onclick=function(ev){
+    ev.preventDefault();
+    a.textContent="Yuklanmoqda...";
+    fetch(url).then(function(r){ return r.blob(); }).then(function(blob){
+      var u=URL.createObjectURL(blob);
+      var link=document.createElement("a"); link.href=u; link.download="nonvoy-rasm.jpg"; document.body.appendChild(link); link.click(); link.remove();
+      a.textContent="✅ Yuklab olindi";
+    }).catch(function(){ window.open(url,"_blank"); a.textContent="⬇️ Yangi oynada ochildi, ushlab turib saqlang"; });
+  };
+  box.appendChild(a);
 }
 function makeVideoFromImage(imgUrl,box){
   var img=new Image();
@@ -208,7 +241,7 @@ function showImageVideo(message,box,doVideo){
   img.onload=function(){
     loading.remove();
     box.appendChild(img);
-    var dl=document.createElement("a"); dl.href=imgUrl; dl.download="nonvoy.png"; dl.textContent="Rasmni yuklab olish"; box.appendChild(dl);
+    downloadImage(imgUrl,box);
     if(doVideo){
       var h3=document.createElement("h3"); h3.textContent="🎬 Video"; box.appendChild(h3);
       var vload=document.createElement("div"); vload.textContent="Video tayyorlanmoqda..."; box.appendChild(vload);
@@ -219,18 +252,38 @@ function showImageVideo(message,box,doVideo){
 }
 async function send(){
   var message=input.value.trim();
+  // RASM TAHLILI - rasm tanlangan bo'lsa
+  if(selectedImage){
+    var q=message || "Bu rasmni tahlil qilib ber. Nima ko'rinayapti?";
+    var userDiv=document.createElement("div"); userDiv.className="message user";
+    userDiv.textContent=q;
+    var uimg=document.createElement("img"); uimg.src=selectedImage; userDiv.appendChild(uimg);
+    document.getElementById("logoWrap").style.display="none"; chat.appendChild(userDiv); chat.scrollTop=chat.scrollHeight;
+    var imgToSend=selectedImage; selectedImage=null;
+    document.getElementById("previewBox").style.display="none"; document.getElementById("fileInput").value=""; input.value=""; input.placeholder="Ask Nonvoy AI... yoki rasm yuborib so'rang"; updateHint();
+    var box=addMessage("","ai"); box.textContent="Rasmni ko'ryapman...";
+    try{
+      var resp=await fetch("/api/chat",{ method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ message: q, history: history, image: imgToSend }) });
+      var d=await resp.json();
+      box.textContent="";
+      var h=document.createElement("h3"); h.textContent="🔍 Rasm tahlili"; box.appendChild(h);
+      var p=document.createElement("div"); p.textContent=cleanReply(d.reply||"Rasmni ko'rdim, chiroyli ekan!"); box.appendChild(p);
+      history.push({role:"user",content:q},{role:"assistant",content:d.reply||""});
+    }catch(e){ box.textContent="Rasmni ko'rdim, chiroyli ekan! Yana bir bor yuborib ko'ring."; }
+    input.focus(); return;
+  }
   if(!message) return;
   var doImage=shouldMakeImage(message);
   var doVideo=wantVideo;
   input.value="";
   addMessage(message,"user");
-  var box=addMessage("","ai");
-  box.textContent="Tayyorlanmoqda...";
+  var box2=addMessage("","ai");
+  box2.textContent="Tayyorlanmoqda...";
   if(doImage){
-    box.textContent="";
-    var h0=document.createElement("h3"); h0.textContent="💬 Matn"; box.appendChild(h0);
-    var p0=document.createElement("div"); p0.textContent="Mana, rasmingizni tayyorladim!"; box.appendChild(p0);
-    showImageVideo(message,box,doVideo);
+    box2.textContent="";
+    var h0=document.createElement("h3"); h0.textContent="💬 Matn"; box2.appendChild(h0);
+    var p0=document.createElement("div"); p0.textContent="Mana, rasmingizni tayyorladim!"; box2.appendChild(p0);
+    showImageVideo(message,box2,doVideo);
     history.push({role:"user",content:message},{role:"assistant",content:"Rasm tayyorlandi"});
     input.focus();
     return;
@@ -238,21 +291,16 @@ async function send(){
   var reply="";
   try{
     var controller=new AbortController();
-    var timer=setTimeout(function(){ controller.abort(); }, 15000);
-    var response=await fetch("/api/chat",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({message:message,history:history}),
-      signal: controller.signal
-    });
+    var timer=setTimeout(function(){ controller.abort(); }, 20000);
+    var response=await fetch("/api/chat",{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({message:message,history:history}), signal: controller.signal });
     clearTimeout(timer);
     var data=await response.json();
     reply=cleanReply(data.reply || "");
   }catch(e){ reply=""; }
-  if(!reply) reply=localReply(message,false);
-  box.textContent="";
-  var h1=document.createElement("h3"); h1.textContent="💬 Matn"; box.appendChild(h1);
-  var p=document.createElement("div"); p.textContent=reply; box.appendChild(p);
+  if(!reply) reply="Tushundim. Savolingizni yozing, yordam beraman.";
+  box2.textContent="";
+  var h1=document.createElement("h3"); h1.textContent="💬 Matn"; box2.appendChild(h1);
+  var p=document.createElement("div"); p.textContent=reply; box2.appendChild(p);
   history.push({role:"user",content:message},{role:"assistant",content:reply});
   input.focus();
 }
@@ -260,4 +308,4 @@ sendBtn.addEventListener("click",send);
 input.addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); send(); } });
 </script>
 </body>
-  </html>
+</html>
