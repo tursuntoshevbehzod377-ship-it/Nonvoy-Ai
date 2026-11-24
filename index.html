@@ -1,40 +1,23 @@
 <!DOCTYPE html>
-<html lang="uz">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Nonvoy AI — Vodiy noni</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#ffd6e7;color:#222;padding-bottom:90px}
-header{padding:14px 12px 6px;text-align:center;position:relative}
-.dots{position:absolute;right:12px;top:12px;font-size:26px;background:#fff;border:2px solid #16a34a;border-radius:10px;padding:2px 10px}
-.newbtn{position:absolute;right:62px;top:12px;font-size:20px;background:#16a34a;color:#fff;border:none;border-radius:10px;padding:6px 12px}
-.menu{position:absolute;left:12px;top:12px;font-size:24px;background:#fff;border:2px solid #16a34a;border-radius:10px;padding:2px 10px}
-.logo{width:110px;height:110px;border-radius:50%;border:4px solid #16a34a;object-fit:cover;background:#fff;display:block;margin:6px auto 4px}
-h1{margin:4px 0 0;color:#15803d;font-size:28px}
-.sub{margin:2px 0 8px;color:#555}
-#sidebar{display:none;background:#fff;margin:8px 12px;border-radius:14px;padding:12px;border:2px solid #16a34a}
-#sidebar div{padding:8px;border-bottom:1px solid #eee}
-#chat{background:#fff5f8;border-radius:16px;padding:12px;border:2px solid #fff;margin:0 12px;min-height:120px}
-.msg{max-width:88%;padding:10px 12px;border-radius:14px;margin:8px 0;white-space:pre-wrap;word-break:break-word}
-.msg.user{background:#16a34a;color:#fff;margin-left:auto}
-.msg.ai{background:#ffe4ef}
-.msg img{max-width:100%;border-radius:12px}
-#previewBox{display:none;background:#fff;border-radius:12px;padding:8px;margin:8px 12px;position:relative}
-#previewBox img{width:100%;border-radius:10px}
-#removeImg{position:absolute;right:14px;top:14px;background:#ef4444;color:#fff;border:none;border-radius:50%;width:30px;height:30px;font-size:18px}
-#form{position:fixed;left:0;right:0;bottom:0;background:#ffd6e7;padding:10px 12px;display:flex;gap:8px;align-items:center;z-index:10}
-#plus{width:46px;height:46px;min-width:46px;border-radius:50%;background:#16a34a;color:#fff;font-size:28px;border:none}
-#input{flex:1;padding:13px;border-radius:24px;border:2px solid #16a34a;outline:none;font-size:16px}
-#send{background:#16a34a;color:#fff;border:none;border-radius:24px;padding:13px 18px;font-size:16px}
-#bigImg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:99;align-items:center;justify-content:center}
-#bigImg img{max-width:95%;max-height:90%;border-radius:12px}
-</style>
-</head>
-<body>
-<header>
-<button class="menu" onclick="toggleSide()">☰</button>
-<button class="newbtn" onclick="newChat()">＋ Yangi</button>
-<button class="dots" onclick="alert('Vodiy noni — Nonvoy AI')">⋮</button>
-<img class="logo" src="https://images.unsplash.com/photo-1509440159596-
+<html lang="uz"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Vodiy noni</title>
+<style>body{margin:0;background:#ffd6e7;font-family:Arial;padding-bottom:90px}header{text-align:center;padding:10px}button{cursor:pointer}.logo{width:100px;height:100px;border-radius:50%;border:4px solid #16a34a;object-fit:cover}h1{color:#15803d;margin:5px}.top{display:flex;justify-content:space-between;padding:0 10px}.top button{background:#fff;border:2px solid #16a34a;border-radius:10px;font-size:22px;padding:4px 10px}.top .y{background:#16a34a;color:#fff}#chat{background:#fff5f8;margin:10px;border-radius:14px;padding:10px;min-height:100px}.msg{padding:9px;border-radius:12px;margin:7px 0;max-width:88%}.u{background:#16a34a;color:#fff;margin-left:auto}.a{background:#ffe4ef}.msg img{max-width:100%;border-radius:10px}#form{position:fixed;left:0;right:0;bottom:0;background:#ffd6e7;padding:10px;display:flex;gap:8px}#plus{width:46px;height:46px;border-radius:50%;background:#16a34a;color:#fff;font-size:26px;border:none}#input{flex:1;padding:12px;border-radius:22px;border:2px solid #16a34a;font-size:16px}#send{background:#16a34a;color:#fff;border:none;border-radius:22px;padding:12px 16px;font-size:16px}#prev{display:none;margin:10px}#prev img{width:100%;border-radius:10px}</style></head>
+<body><header><div class="top"><button onclick="alert('Oldingi suhbatlar tez orada')">☰</button><button class="y" onclick="location.reload()">＋ Yangi</button><button>⋮</button></div>
+<img class="logo" src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400"><h1>Vodiy noni</h1><p>Nonvoy AI — rasm chizadi, rasmni tahlil qiladi, darsga javob beradi</p></header>
+<div id="chat"><div class="msg a">Salom! Men Nonvoy AI man.</div></div>
+<div id="prev"><img id="pv"></div>
+<form id="form" onsubmit="sendMsg(event)"><button type="button" id="plus" onclick="document.getElementById('file').click()">＋</button><input type="file" id="file" accept="image/*" hidden onchange="onFile(event)"><input id="input" placeholder="Yozing..."><button id="send">➤</button></form>
+<script>
+let imgData=null,waiting=false;const chat=document.getElementById('chat');
+function add(w,t,img){let d=document.createElement('div');d.className='msg '+(w==='u'?'u':'a');d.innerHTML=(img?'<img src="'+img+'"><br>':'')+t;chat.appendChild(d);window.scrollTo(0,99999);}
+function tr(t){let p=t.toLowerCase();if(p.includes('gul'))return 'beautiful red roses, colorful flowers in garden, photorealistic';if(p.includes('mushuk'))return 'cute cat, photorealistic';if(p.includes('it'))return 'cute dog, photorealistic';if(p.includes('qiz'))return 'beautiful young Uzbek girl, smiling, traditional dress, photorealistic portrait';if(p.includes('tog'))return 'beautiful mountains, photorealistic';return t+' photorealistic, beautiful';}
+function draw(p){return 'https://image.pollinations.ai/prompt/'+encodeURIComponent(tr(p))+'?width=800&height=1000&nologo=true&seed='+Math.floor(Math.random()*99999);}
+function onFile(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{imgData=r.result;document.getElementById('pv').src=imgData;document.getElementById('prev').style.display='block';};r.readAsDataURL(f);}
+async function sendMsg(e){e.preventDefault();let inp=document.getElementById('input');let text=inp.value.trim();let myImg=imgData;if(!text&&!myImg)return;add('u',text||'Bu rasmda nima bor?',myImg);inp.value='';imgData=null;document.getElementById('prev').style.display='none';
+let low=text.toLowerCase();
+if(low.includes('rasm chizib ber')){waiting=true;add('a','Qanaqa rasm chizib beray?');return;}
+if(low.includes('qiz')&&low.includes('rasm')){add('a','Chizib beryapman...');add('a','Mana qiz bolani rasmi',draw(text));return;}
+if(low.includes('rasm')&&low.includes('chiz')){add('a','Chizib beryapman...');add('a','Mana rasmingiz',draw(text));return;}
+if(waiting){waiting=false;add('a','Chizib beryapman...');add('a','Mana rasmingiz',draw(text));return;}
+add('a','O‘ylayapman...');
+try{let res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,image:myImg})});let d=await res.json();let els=document.querySelectorAll('.msg.a');els[els.length-1].textContent=d.reply||d.text||'Javob kelmadi';}catch(err){let els=document.querySelectorAll('.msg.a');els[els.length-1].textContent='Serverda xatolik.';}}
+</script></body></html>
