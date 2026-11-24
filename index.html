@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-<【entity-meta¦canonical_name=Meta】 charset="UTF-8">
-<【entity-meta¦canonical_name=Meta】 name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nonvoy AI</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:#fff;color:#111;display:flex;flex-direction:column;min-height:100vh}
-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px}
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;position:fixed;top:0;left:0;right:0;background:#fff;z-index:50}
 .header-left{display:flex;align-items:center;gap:10px}
 .menu-btn{width:44px;height:44px;border-radius:50%;border:none;background:#f1f1f1;font-size:22px}
 .header-title{font-size:20px;font-weight:500}
@@ -18,13 +18,12 @@ header{display:flex;align-items:center;justify-content:space-between;padding:12p
 #sidebar button{display:block;width:100%;padding:12px;margin:8px 0;border:none;border-radius:12px;background:#f1f1f1;text-align:left;font-size:15px}
 #overlay{position:fixed;inset:0;background:rgba(0,0,0,0.3);display:none;z-index:90}
 #overlay.show{display:block}
-#dotsMenu{position:absolute;top:60px;right:14px;background:#fff;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,0.15);padding:8px;display:none;z-index:99;width:180px}
+#dotsMenu{position:fixed;top:60px;right:14px;background:#fff;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,0.15);padding:8px;display:none;z-index:99;width:180px}
 #dotsMenu.show{display:block}
 #dotsMenu button{display:block;width:100%;padding:12px;border:none;background:none;text-align:left;font-size:15px}
-main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin:0 auto;padding:10px}
-.logo-wrap{text-align:center;margin:60px 0 20px 0}
-.logo{font-size:64px;animation:spin 6s linear infinite;display:inline-block}
-@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin:70px auto 0 auto;padding:10px;padding-bottom:140px}
+.logo-wrap{text-align:center;margin:80px 0 20px 0}
+.logo{font-size:64px;display:inline-block}
 .logo-text{font-size:22px;font-weight:bold;margin-top:6px}
 .logo-sub{color:#888;font-size:14px}
 #chat{flex:1;display:flex;flex-direction:column;gap:12px;overflow-y:auto;padding-bottom:10px}
@@ -34,13 +33,14 @@ main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin
 .message.ai img,.message.ai video,.message.ai canvas{width:100%;border-radius:14px;margin-top:10px}
 .message.ai a{color:#0a7a42;display:block;margin-top:6px}
 .message.ai h3{margin:10px 0 4px 0;font-size:15px;color:#0a7a42}
-.input-box{display:flex;flex-direction:column;background:#fff;border:1px solid #eee;border-radius:24px;box-shadow:0 4px 20px rgba(0,0,0,0.08);padding:10px;margin:10px 0}
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:10px 12px 16px 12px;z-index:50}
+.input-box{max-width:700px;margin:0 auto;display:flex;flex-direction:column;background:#fff;border:1px solid #e5e5e5;border-radius:24px;box-shadow:0 4px 20px rgba(0,0,0,0.08);padding:10px}
 .input-row{display:flex;align-items:center;gap:8px}
-#msg{flex:1;border:none;outline:none;font-size:16px;padding:10px}
-.plus-btn{width:40px;height:40px;border-radius:50%;border:1px solid #ddd;background:#fff;font-size:22px}
+#msg{flex:1;border:none;outline:none;font-size:17px;padding:10px;background:transparent}
+.plus-btn{width:42px;height:42px;min-width:42px;border-radius:50%;border:1px solid #ddd;background:#fff;font-size:24px;display:flex;align-items:center;justify-content:center}
 .instant-btn{border:1px solid #ddd;background:#fff;border-radius:999px;padding:8px 16px}
-.send-btn{width:44px;height:44px;border-radius:50%;border:none;background:#eee;font-size:20px}
-footer{text-align:center;padding:8px;color:#aaa;font-size:13px}
+.send-btn{width:44px;height:44px;min-width:44px;border-radius:50%;border:none;background:#111;color:#fff;font-size:20px}
+footer{text-align:center;padding:4px;color:#aaa;font-size:12px}
 </style>
 </head>
 <body>
@@ -63,8 +63,10 @@ footer{text-align:center;padding:8px;color:#aaa;font-size:13px}
 <button class="menu-btn" onclick="openSidebar()">☰</button>
 <span class="header-title">Nonvoy AI</span>
 </div>
+<div style="display:flex;gap:8px;align-items:center">
 <button class="glasses-btn" onclick="alert('Glasses tez orada')">👓 Glasses</button>
 <button class="menu-btn" onclick="toggleDots()">⋮</button>
+</div>
 </header>
 <main>
 <div class="logo-wrap" id="logoWrap">
@@ -73,6 +75,8 @@ footer{text-align:center;padding:8px;color:#aaa;font-size:13px}
 <div class="logo-sub">Matn + Rasm + Video — uchovi bitta oynada</div>
 </div>
 <div id="chat"></div>
+</main>
+<div class="bottom-bar">
 <div class="input-box">
 <div class="input-row">
 <input id="msg" placeholder="Ask Nonvoy AI...">
@@ -85,8 +89,8 @@ footer{text-align:center;padding:8px;color:#aaa;font-size:13px}
 </div>
 </div>
 </div>
-</main>
-<footer>Nonvoy AI © 2026</footer>
+<div style="text-align:center;color:#aaa;font-size:12px;margin-top:6px">Nonvoy AI © 2026</div>
+</div>
 <script>
 const chat=document.getElementById("chat");
 const input=document.getElementById("msg");
