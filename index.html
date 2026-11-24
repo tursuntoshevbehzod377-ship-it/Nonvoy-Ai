@@ -41,41 +41,4 @@ h1{margin:4px 0 0;color:#15803d;font-size:28px}
 <h1>Vodiy noni</h1>
 <p class="sub">Nonvoy AI — rasm chizadi, rasmni tahlil qiladi, dars savollariga javob beradi</p>
 </header>
-<div id="sidebar"><b>Oldingi suhbatlar</b><div id="history"></div><div onclick="newChat()">＋ Yangi suhbat</div></div>
-<main>
-<div id="chat"><div class="msg ai">Salom! Men Nonvoy AI man.</div></div>
-<div id="previewBox"><img id="preview"><button id="removeImg" onclick="clearImg()">✕</button></div>
-<form id="form" onsubmit="sendMsg(event)">
-<button type="button" id="plus" onclick="document.getElementById('file').click()">＋</button>
-<input type="file" id="file" accept="image/*" hidden onchange="onFile(event)">
-<input id="input" placeholder="Yozing...">
-<button id="send">➤</button>
-</form>
-</main>
-<div id="bigImg" onclick="this.style.display='none'"><img id="bigPic"></div>
-<script>
-let chats=JSON.parse(localStorage.getItem('nonvoy_chats')||'[]');
-let cur=0; let imgData=null; let waitingDraw=false;
-const chatEl=document.getElementById('chat');
-function save(){localStorage.setItem('nonvoy_chats',JSON.stringify(chats)); renderHistory();}
-function renderHistory(){document.getElementById('history').innerHTML=chats.map((c,i)=>`<div onclick="openChat(${i})">${(c[0]&&c[0].t?c[0].t.slice(0,35):'Suhbat')}</div>`).join('')||'Hali suhbat yo‘q';}
-function render(){chatEl.innerHTML=(chats[cur]||[]).map(m=>`<div class="msg ${m.who}">${m.img?`<img src="${m.img}" onclick="zoom(this.src)"><br>`:''}${m.t}</div>`).join('')||'<div class="msg ai">Salom! Men Nonvoy AI man.</div>';chatEl.scrollTop=chatEl.scrollHeight;}
-function add(who,t,img){if(!chats[cur])chats[cur]=[];chats[cur].push({who,t,img:img||''});save();render();}
-function newChat(){chats.unshift([]);cur=0;save();render();}
-function openChat(i){cur=i;render();document.getElementById('sidebar').style.display='none';}
-function toggleSide(){let s=document.getElementById('sidebar');s.style.display=s.style.display==='block'?'none':'block';}
-function onFile(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{imgData=r.result;document.getElementById('preview').src=imgData;document.getElementById('previewBox').style.display='block';};r.readAsDataURL(f);}
-function clearImg(){imgData=null;document.getElementById('previewBox').style.display='none';document.getElementById('file').value='';}
-function zoom(s){document.getElementById('bigPic').src=s;document.getElementById('bigImg').style.display='flex';}
-async function sendMsg(e){e.preventDefault();let inp=document.getElementById('input');let text=inp.value.trim();let myImg=imgData;if(!text&&!myImg)return;if(myImg)add('user',text||'Bu rasmda nima bor?',myImg);else add('user',text);inp.value='';clearImg();
-let low=text.toLowerCase();
-if(low.includes('rasm chizib ber')){waitingDraw=true;add('ai','Qanaqa rasm chizib beray?');return;}
-if(low.includes('qizni rasmini')||low.includes('qiz bolani rasmi')){add('ai','Chizib beryapman...');let img=await drawImage('beautiful Uzbek girl, smiling, traditional dress');add('ai','Mana qiz bolani rasmi',img);return;}
-if(waitingDraw){waitingDraw=false;add('ai','Chizib beryapman...');let img=await drawImage(text);add('ai','Mana rasmingiz',img);return;}
-add('ai','O‘ylayapman...');
-try{let res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,image:myImg})});let d=await res.json();let els=document.querySelectorAll('.msg.ai');els[els.length-1].textContent=d.reply||d.text||'Javob kelmadi';}catch(err){let els=document.querySelectorAll('.msg.ai');els[els.length-1].textContent='Serverda xatolik.';}}
-async function drawImage(prompt){try{let res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:'Rasm chiz: '+prompt,draw:true})});let d=await res.json();if(d.image)return d.image;}catch(e){}return 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800';}
-if(chats.length===0)chats=[[]];renderHistory();render();
-</script>
-</body>
-</html>
+<div id="sidebar"><b>Oldingi suhbatlar</b><div id="history"></div><div onclick="
