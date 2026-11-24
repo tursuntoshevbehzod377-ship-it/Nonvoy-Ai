@@ -1,50 +1,103 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<【entity-meta¦canonical_name=Meta】 charset="UTF-8">
+<【entity-meta¦canonical_name=Meta】 name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nonvoy AI</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#0f172a;color:#fff;display:flex;flex-direction:column;min-height:100vh}
-header{padding:16px;text-align:center;font-weight:bold;font-size:20px;background:#020617}
-main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin:0 auto;padding:12px}
-.welcome{text-align:center;margin:20px 0}
-.welcome h1{margin:0;font-size:26px}
-.welcome p{color:#94a3b8}
-#chat{flex:1;display:flex;flex-direction:column;gap:10px;overflow-y:auto;padding-bottom:10px}
-.message{max-width:92%;padding:12px 14px;border-radius:14px;line-height:1.5;word-wrap:break-word}
-.message.user{background:#22c55e;color:#000;align-self:flex-end}
-.message.ai{background:#1e293b;align-self:flex-start}
-.message.ai img,.message.ai video,.message.ai canvas{width:100%;border-radius:12px;margin-top:10px}
-.message.ai a{color:#22c55e;display:block;margin-top:6px}
-.message.ai h3{margin:10px 0 4px 0;font-size:15px;color:#22c55e}
-.input-area{display:flex;gap:8px}
-#msg{flex:1;padding:12px;border-radius:12px;border:none;outline:none;background:#1e293b;color:#fff}
-#send{padding:12px 18px;border-radius:12px;border:none;background:#22c55e;font-weight:bold}
-footer{text-align:center;padding:10px;color:#64748b;font-size:13px}
+body{margin:0;font-family:Arial,sans-serif;background:#fff;color:#111;display:flex;flex-direction:column;min-height:100vh}
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px}
+.header-left{display:flex;align-items:center;gap:10px}
+.menu-btn{width:44px;height:44px;border-radius:50%;border:none;background:#f1f1f1;font-size:22px}
+.header-title{font-size:20px;font-weight:500}
+.glasses-btn{border:none;background:#f1f1f1;border-radius:999px;padding:10px 16px;font-size:15px}
+#sidebar{position:fixed;top:0;left:-260px;width:250px;height:100%;background:#fff;box-shadow:2px 0 10px rgba(0,0,0,0.15);padding:20px;transition:0.3s;z-index:99}
+#sidebar.open{left:0}
+#sidebar h3{margin-top:0}
+#sidebar button{display:block;width:100%;padding:12px;margin:8px 0;border:none;border-radius:12px;background:#f1f1f1;text-align:left;font-size:15px}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,0.3);display:none;z-index:90}
+#overlay.show{display:block}
+#dotsMenu{position:absolute;top:60px;right:14px;background:#fff;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,0.15);padding:8px;display:none;z-index:99;width:180px}
+#dotsMenu.show{display:block}
+#dotsMenu button{display:block;width:100%;padding:12px;border:none;background:none;text-align:left;font-size:15px}
+main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin:0 auto;padding:10px}
+.logo-wrap{text-align:center;margin:60px 0 20px 0}
+.logo{font-size:64px;animation:spin 6s linear infinite;display:inline-block}
+@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+.logo-text{font-size:22px;font-weight:bold;margin-top:6px}
+.logo-sub{color:#888;font-size:14px}
+#chat{flex:1;display:flex;flex-direction:column;gap:12px;overflow-y:auto;padding-bottom:10px}
+.message{max-width:92%;padding:12px 14px;border-radius:18px;line-height:1.5;word-wrap:break-word}
+.message.user{background:#e8f5e9;align-self:flex-end}
+.message.ai{background:#f1f1f1;align-self:flex-start}
+.message.ai img,.message.ai video,.message.ai canvas{width:100%;border-radius:14px;margin-top:10px}
+.message.ai a{color:#0a7a42;display:block;margin-top:6px}
+.message.ai h3{margin:10px 0 4px 0;font-size:15px;color:#0a7a42}
+.input-box{display:flex;flex-direction:column;background:#fff;border:1px solid #eee;border-radius:24px;box-shadow:0 4px 20px rgba(0,0,0,0.08);padding:10px;margin:10px 0}
+.input-row{display:flex;align-items:center;gap:8px}
+#msg{flex:1;border:none;outline:none;font-size:16px;padding:10px}
+.plus-btn{width:40px;height:40px;border-radius:50%;border:1px solid #ddd;background:#fff;font-size:22px}
+.instant-btn{border:1px solid #ddd;background:#fff;border-radius:999px;padding:8px 16px}
+.send-btn{width:44px;height:44px;border-radius:50%;border:none;background:#eee;font-size:20px}
+footer{text-align:center;padding:8px;color:#aaa;font-size:13px}
 </style>
 </head>
 <body>
-<header>Nonvoy AI</header>
+<div id="overlay" onclick="closeAll()"></div>
+<div id="sidebar">
+<h3>Nonvoy AI</h3>
+<button onclick="newChat()">✨ Yangi suhbat</button>
+<button onclick="closeAll()">💬 Suhbatlar</button>
+<button onclick="closeAll()">🖼️ Rasmlarim</button>
+<button onclick="closeAll()">🎬 Videolarim</button>
+<button onclick="closeAll()">⚙️ Sozlamalar</button>
+</div>
+<div id="dotsMenu">
+<button onclick="newChat()">✨ Yangi suhbat</button>
+<button onclick="alert('Ulashish tez orada')">🔗 Ulashish</button>
+<button onclick="alert('Nonvoy AI v2.0')">ℹ️ Sayt haqida</button>
+</div>
+<header>
+<div class="header-left">
+<button class="menu-btn" onclick="openSidebar()">☰</button>
+<span class="header-title">Nonvoy AI</span>
+</div>
+<button class="glasses-btn" onclick="alert('Glasses tez orada')">👓 Glasses</button>
+<button class="menu-btn" onclick="toggleDots()">⋮</button>
+</header>
 <main>
-<div class="welcome">
-<h1>Men Nonvoy AI</h1>
-<p>Yozing — matn + rasm + video uchovi birga chiqadi</p>
+<div class="logo-wrap" id="logoWrap">
+<div class="logo">✦</div>
+<div class="logo-text">Nonvoy AI</div>
+<div class="logo-sub">Matn + Rasm + Video — uchovi bitta oynada</div>
 </div>
 <div id="chat"></div>
-<div class="input-area">
-<input id="msg" placeholder="Masalan: Gul, Qizil mashina...">
-<button id="send" onclick="send()">Yuborish</button>
+<div class="input-box">
+<div class="input-row">
+<input id="msg" placeholder="Ask Nonvoy AI...">
+</div>
+<div class="input-row" style="justify-content:space-between;margin-top:6px">
+<button class="plus-btn" onclick="alert('Rasm yuklash tez orada')">+</button>
+<div style="display:flex;gap:8px;align-items:center">
+<button class="instant-btn">Instant</button>
+<button class="send-btn" onclick="send()">↑</button>
+</div>
+</div>
 </div>
 </main>
 <footer>Nonvoy AI © 2026</footer>
 <script>
 const chat=document.getElementById("chat");
 const input=document.getElementById("msg");
-const button=document.getElementById("send");
+const button=document.querySelector(".send-btn");
 let history=[];
+function openSidebar(){ document.getElementById("sidebar").classList.add("open"); document.getElementById("overlay").classList.add("show"); }
+function toggleDots(){ document.getElementById("dotsMenu").classList.toggle("show"); }
+function closeAll(){ document.getElementById("sidebar").classList.remove("open"); document.getElementById("overlay").classList.remove("show"); document.getElementById("dotsMenu").classList.remove("show"); }
+function newChat(){ chat.innerHTML=""; document.getElementById("logoWrap").style.display="block"; history=[]; closeAll(); }
 function addMessage(text,type){
+  document.getElementById("logoWrap").style.display="none";
   const div=document.createElement("div");
   div.className="message "+type;
   div.textContent=text;
@@ -150,7 +203,6 @@ async function send(){
   input.focus();
 }
 input.addEventListener("keydown",function(e){ if(e.key==="Enter") send(); });
-button.addEventListener("click",send);
 </script>
 </body>
 </html>
