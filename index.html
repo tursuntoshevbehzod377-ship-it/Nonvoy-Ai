@@ -17,7 +17,8 @@ h1{font-size:22px}
 .bubble{max-width:85%;padding:12px 14px;border-radius:18px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
 .me{align-self:flex-end;background:#d3f8d3}
 .ai{align-self:flex-start;background:#f1f1f1}
-.bubble img{width:100%;border-radius:12px;margin-top:10px;display:block;max-height:400px;object-fit:cover}
+.bubble img{width:100%;border-radius:12px;margin-top:10px;display:block;max-height:400px;object-fit:cover;cursor:zoom-in}
+.bubble img:active{opacity:.9}
 .label{font-weight:700;margin-bottom:6px;font-size:14px}
 .label.green{color:#0a7a2a}
 .ask-box{background:#fff7d6;border:1px solid #f5d76e;padding:12px;border-radius:14px}
@@ -37,6 +38,12 @@ footer{padding:10px 12px 14px;border-top:1px solid #eee;background:#fff}
 .preview-box{margin:8px 12px 0;display:none}
 .preview-box img{width:80px;height:80px;object-fit:cover;border-radius:12px;border:2px solid #f5b301}
 .preview-box span{font-size:13px;color:#555;margin-left:8px}
+/* ✅ RASMNI KATTALASHTIRISH - bosganda to'liq ekran */
+#lightbox{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.92);z-index:100;align-items:center;justify-content:center;flex-direction:column;padding:16px}
+#lightbox.show{display:flex}
+#lightbox img{max-width:100%;max-height:85vh;border-radius:12px;object-fit:contain}
+#lightboxClose{position:absolute;top:14px;right:18px;color:#fff;font-size:34px;cursor:pointer;background:none;border:none}
+#lightboxText{color:#fff;margin-top:12px;font-size:14px}
 </style>
 </head>
 <body>
@@ -67,9 +74,16 @@ footer{padding:10px 12px 14px;border-top:1px solid #eee;background:#fff}
     <button class="mode on" id="modeRasm" onclick="setMode('rasm')">🖼️ Rasm</button>
     <button class="mode" id="modeVideo" onclick="setMode('video')">🎬 Video</button>
   </div>
-  <div class="hint">+ ni bosib rasm yuboring — tahlil qilib beradi</div>
+  <div class="hint">+ ni bosib rasm yuboring — tahlil qilib beradi • Rasm ustiga bossangiz kattalashadi</div>
 </footer>
 <input type="file" id="fileInput" accept="image/*">
+
+<!-- KATTA RASM OYNASI -->
+<div id="lightbox">
+  <button id="lightboxClose">✕</button>
+  <img id="lightboxImg" src="">
+  <div id="lightboxText">Yopish uchun rasmga bosing</div>
+</div>
 
 <script>
 let waitingForImageSubject=false,videoMode=false,pendingImageData=null;
@@ -81,29 +95,9 @@ const saved=localStorage.getItem('nonvoy_chat');
 if(saved)chatEl.innerHTML=saved;else addBubble('Salom! Qanday yordam bera olaman?','ai');
 const dict={'qizil':'red','qiz':'girl','mashina':'car','gul':'flower',"g'unchak":'rose bud','tog':'mountain','dengiz':'sea','ot':'horse','mushuk':'cat','it':'dog','uy':'house','qush':'bird','olma':'apple','non':'bread'};
 function translateUzToEn(t){let s=' '+t.toLowerCase()+' ';for(const k in dict){s=s.split(k).join(dict[k]);}return s.trim();}
-
-// ✅ YANGI QOIDA: Savol bo'lsa - rasm chizmaydi, matn bilan javob beradi
-function isQuestion(t){
-  const s=t.toLowerCase().trim();
-  return s.startsWith('nimani')||s.startsWith('nima')||s.startsWith('qanaqa')||s.startsWith('qanday')||s.startsWith('kim')||s.startsWith('qayer')||s.startsWith('qachon')||s.startsWith('necha')||s.includes('ko\'rayapsan')||s.includes('ko\'ryapsan')||s.includes('?');
-}
-function isVagueImageRequest(t){
-  const s=t.toLowerCase().trim();
-  const v=['rasm chizib ber','rasm chiz','rasm yasab ber','rasm yasab','rasm chizib','rasm kerak','rasm','rasm chizib bering','rasm yarat','rasm yaratib ber','chizib ber','rasm chiqarib ber'];
-  if(v.includes(s))return true;
-  if(s.startsWith('rasm chizib ber')&&s.replace('rasm chizib ber','').trim().length<2)return true;
-  return false;
-}
-// ✅ FAQAT chizish buyrug'i bo'lsa - rasm chizadi
-function isImageRequest(t){
-  const s=t.toLowerCase();
-  // "chizib ber", "yasab ber", "yaratib ber" bo'lsa - chizish
-  if(s.includes('chiz')||s.includes('yasab ber')||s.includes('yaratib ber')||s.includes('chizib')) return true;
-  // "Qizil mashina rasmi" - mavzu + rasmi bo'lsa ham chizish
-  if(s.includes('rasmi')&&!isQuestion(t)) return true;
-  if(s.includes('rasmini')&&!isQuestion(t)) return true;
-  return false;
-}
+function isQuestion(t){const s=t.toLowerCase().trim();return s.startsWith('nimani')||s.startsWith('nima')||s.startsWith('qanaqa')||s.startsWith('qanday')||s.startsWith('kim')||s.startsWith('qayer')||s.startsWith('qachon')||s.startsWith('necha')||s.includes("ko'rayapsan")||s.includes("ko'ryapsan")||s.includes('?');}
+function isVagueImageRequest(t){const s=t.toLowerCase().trim();const v=['rasm chizib ber','rasm chiz','rasm yasab ber','rasm yasab','rasm chizib','rasm kerak','rasm','rasm chizib bering','rasm yarat','rasm yaratib ber','chizib ber','rasm chiqarib ber'];if(v.includes(s))return true;if(s.startsWith('rasm chizib ber')&&s.replace('rasm chizib ber','').trim().length<2)return true;return false;}
+function isImageRequest(t){const s=t.toLowerCase();if(s.includes('chiz')||s.includes('yasab ber')||s.includes('yaratib ber')||s.includes('chizib'))return true;if(s.includes('rasmi')&&!isQuestion(t))return true;if(s.includes('rasmini')&&!isQuestion(t))return true;return false;}
 function askWhatImage(){waitingForImageSubject=true;addBubble(`<div class="label green">💬 Matn</div><div class="ask-box"><b>Qanaqa rasm chizib beray? 🤔</b><br><br>Mavzuni yozing.</div><div class="chips"><button class="chip" onclick="pickSubject('Qizil mashina')">🚗 Qizil mashina</button><button class="chip" onclick="pickSubject('Gul')">🌹 Gul</button><button class="chip" onclick="pickSubject('Tog manzarasi')">🏔️ Tog' manzarasi</button><button class="chip" onclick="pickSubject('Mushuk')">🐱 Mushuk</button></div>`,'ai',true);saveChat();}
 function pickSubject(s){inp.value=s;sendMessage();}
 async function sendMessage(){
@@ -113,7 +107,6 @@ async function sendMessage(){
   addBubble(text,'me');inp.value='';
   if(isVagueImageRequest(text)){askWhatImage();saveChat();return;}
   if(isImageRequest(text)){generateImage(text);return;}
-  // Savol / oddiy matn - OpenRouter ga yuboradi, rasm chizmaydi
   const b=addBubble('Yozilyapti...','ai');try{const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});const d=await r.json();b.innerHTML='<div class="label green">💬 Matn</div>'+escapeHtml(d.reply||d.error||'Xato');}catch(e){b.textContent='Xato: '+e.message;}saveChat();
 }
 function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -122,6 +115,18 @@ document.getElementById('send').onclick=sendMessage;
 inp.addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
 document.getElementById('plus').onclick=()=>document.getElementById('fileInput').click();
 document.getElementById('fileInput').onchange=(e)=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{pendingImageData=rd.result;document.getElementById('previewImg').src=rd.result;document.getElementById('previewBox').style.display='flex';inp.placeholder='Bu rasmda nima bor? deb yozing...';inp.focus();};rd.readAsDataURL(f);e.target.value='';};
+
+// ✅ RASM USTIGA BOSGANDA KATTALASHTIRISH
+chatEl.addEventListener('click', function(e){
+  const img = e.target.closest('img');
+  if(img && img.id !== 'previewImg'){
+    document.getElementById('lightboxImg').src = img.src;
+    document.getElementById('lightbox').classList.add('show');
+  }
+});
+document.getElementById('lightbox').onclick = function(){ this.classList.remove('show'); };
+document.getElementById('lightboxClose').onclick = function(e){ e.stopPropagation(); document.getElementById('lightbox').classList.remove('show'); };
+document.getElementById('previewImg').onclick = function(){ document.getElementById('lightboxImg').src = this.src; document.getElementById('lightbox').classList.add('show'); };
 </script>
 </body>
 </html>
