@@ -8,18 +8,25 @@ export default async function handler(req, res) {
     const text = (message || '').toString().trim();
     const lower = text.toLowerCase();
     const GROQ = process.env.GROQ_API_KEY;
-    const GEMINI = process.env.GEMINI_API_KEY;
 
-    // 1. RASM KELSA - FAQAT TAHLIL
+    // 1. RASM KELSA - FAQAT TAHLIL, GROQ BILAN
     if (image) {
-      const b64 = image.includes(',') ? image.split(',')[1] : image;
-      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI}`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: `O'zbek tilida javob ber. Rasm chizma. Faqat rasmda nima borligini ayt. Savol: ${text}` }, { inline_data: { mime_type: 'image/jpeg', data: b64 } }] }] })
+      const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST', headers: { 'Authorization': `Bearer ${GROQ}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'meta-llama/llama-4-maverick-17b-128e-instruct',
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'text', text: `O'zbek tilida javob ber. Rasm chizma. Faqat rasmda nima borligini aniq ayt. Agar mashina bo'lsa marka, model, rang, yilni ayt. Savol: ${text || 'Bu rasmda nima bor?'}` },
+              { type: 'image_url', image_url: { url: image } }
+            ]
+          }]
+        })
       });
       const d = await r.json();
-      const ans = d?.candidates?.[0]?.content?.parts?.map(p => p.text).join('');
-      return res.status(200).json({ reply: ans || ('Gemini xatosi: ' + (d?.error?.message || 'kalitni tekshir')) });
+      const ans = d?.choices?.[0]?.message?.content;
+      return res.status(200).json({ reply: ans || ('Groq xatosi: ' + (d?.error?.message || 'kalitni tekshir')) });
     }
 
     // 2. RASM CHIZISH
@@ -28,25 +35,15 @@ export default async function handler(req, res) {
       return res.status(200).json({ reply: 'Mana rasming:', imageUrl: url });
     }
 
-    // 3. MATN - AVVAL GROQ
-    if (GROQ) {
-      const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST', headers: { 'Authorization': `Bearer ${GROQ}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'llama-3.1-8b-instant', messages: [{ role: 'system', content: `Sen Nonvoy AI san. O'zbek tilida javob ber.` }, { role: 'user', content: text }] })
-      });
-      const d = await r.json();
-      if (d?.choices?.[0]?.message?.content) return res.status(200).json({ reply: d.choices[0].message.content });
-    }
-
-    // 4. MATN - KEYIN GEMINI
-    const r2 = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI}`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: text }] }] })
+    // 3. MATN
+    const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST', headers: { 'Authorization': `Bearer ${GROQ}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'openai/gpt-oss-120b', messages: [{ role: 'system', content: `Sen Nonvoy AI san. O'zbek tilida javob ber.` }, { role: 'user', content: text }] })
     });
-    const d2 = await r2.json();
-    const ans2 = d2?.candidates?.[0]?.content?.parts?.map(p => p.text).join('');
-    return res.status(200).json({ reply: ans2 || ('Gemini xatosi: ' + (d2?.error?.message || 'kalitni tekshir')) });
+    const d = await r.json();
+    const ans = d?.choices?.[0]?.message?.content;
+    return res.status(200).json({ reply: ans || ('Groq xatosi: ' + (d?.error?.message || 'kalitni tekshir')) });
   } catch (e) {
     return res.status(200).json({ reply: 'Xato: ' + e.message });
   }
-  }
+}
