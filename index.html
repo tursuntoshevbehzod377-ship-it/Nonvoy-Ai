@@ -22,9 +22,9 @@ header{display:flex;align-items:center;justify-content:space-between;padding:12p
 #dotsMenu.show{display:block}
 #dotsMenu button{display:block;width:100%;padding:12px;border:none;background:none;text-align:left;font-size:15px}
 main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin:70px auto 0 auto;padding:10px;padding-bottom:140px}
-.logo-wrap{text-align:center;margin:80px 0 20px 0}
-.logo{font-size:64px;display:inline-block}
-.logo-text{font-size:22px;font-weight:bold;margin-top:6px}
+.logo-wrap{text-align:center;margin:70px 0 20px 0}
+.logo-img{width:130px;height:130px;object-fit:cover;border-radius:50%;border:3px solid #f5d76e;box-shadow:0 6px 20px rgba(0,0,0,0.12)}
+.logo-text{font-size:22px;font-weight:bold;margin-top:10px}
 .logo-sub{color:#888;font-size:14px}
 #chat{flex:1;display:flex;flex-direction:column;gap:12px;overflow-y:auto;padding-bottom:10px}
 .message{max-width:92%;padding:12px 14px;border-radius:18px;line-height:1.5;word-wrap:break-word}
@@ -40,7 +40,6 @@ main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin
 .plus-btn{width:42px;height:42px;min-width:42px;border-radius:50%;border:1px solid #ddd;background:#fff;font-size:24px;display:flex;align-items:center;justify-content:center}
 .instant-btn{border:1px solid #ddd;background:#fff;border-radius:999px;padding:8px 16px}
 .send-btn{width:44px;height:44px;min-width:44px;border-radius:50%;border:none;background:#111;color:#fff;font-size:20px}
-footer{text-align:center;padding:4px;color:#aaa;font-size:12px}
 </style>
 </head>
 <body>
@@ -70,9 +69,9 @@ footer{text-align:center;padding:4px;color:#aaa;font-size:12px}
 </header>
 <main>
 <div class="logo-wrap" id="logoWrap">
-<div class="logo">✦</div>
+<img class="logo-img" src="https://image.pollinations.ai/prompt/fresh%20uzbek%20non%20bread%20round%20golden%20crispy%20traditional%20uzbek%20lepeshka%20on%20white%20background%20professional%20food%20photography?width=400&height=400&seed=12345&nologo=true&model=flux" alt="Nonvoy AI - Non">
 <div class="logo-text">Nonvoy AI</div>
-<div class="logo-sub">Matn + Rasm + Video — uchovi bitta oynada</div>
+<div class="logo-sub">Matn + Rasm + Video — kerak bo'lsa chiqadi</div>
 </div>
 <div id="chat"></div>
 </main>
@@ -108,6 +107,14 @@ function addMessage(text,type){
   chat.appendChild(div);
   chat.scrollTop=chat.scrollHeight;
   return div;
+}
+function shouldMakeImage(msg){
+  const t=msg.toLowerCase().trim();
+  if(/(rasm|surat|foto|tasvir|chiz|yarat|ko'rsat|korsat|video|animatsiya|image|picture|draw|generate|chizib|yaratib)/.test(t)) return true;
+  if(/^(salom|assalom|salomlar|hi|hello|hey|hayr|xayr|qalesan|qandaysan|yaxshimisan|yaxshi|rahmat|tushunarli|ha|yo'q|ok|okey)/.test(t)) return false;
+  if(t.includes("?") || /(^|\s)(nima|qanday|nega|nima uchun|kim|qachon|qayerda|qayerga|qayerdan|nechta|necha|qaysi|qanaqa|tushuntir|ayt|yoz|hisobla|tarjima|yordam|maslahat|nima qilish|qanday qilish|bo'ladimi|mumkinmi|kerakmi)/.test(t)) return false;
+  if(t.split(" ").length<=2) return false;
+  return false;
 }
 function translate(prompt){
   let e=prompt;
@@ -186,20 +193,22 @@ async function send(){
     const h1=document.createElement("h3"); h1.textContent="💬 Matn"; box.appendChild(h1);
     const p=document.createElement("div"); p.textContent=reply; box.appendChild(p);
     history.push({role:"user",content:message},{role:"assistant",content:reply});
-    const h2=document.createElement("h3"); h2.textContent="🖼️ Rasm"; box.appendChild(h2);
-    const imgUrl=makeImageUrl(message);
-    const img=document.createElement("img");
-    img.src=imgUrl;
-    const loading=document.createElement("div"); loading.textContent="Rasm tayyorlanmoqda..."; box.appendChild(loading);
-    img.onload=()=>{
-      loading.remove();
-      box.appendChild(img);
-      const dl=document.createElement("a"); dl.href=imgUrl; dl.download="nonvoy.png"; dl.textContent="Rasmni yuklab olish"; box.appendChild(dl);
-      const h3=document.createElement("h3"); h3.textContent="🎬 Video"; box.appendChild(h3);
-      const vload=document.createElement("div"); vload.textContent="Video tayyorlanmoqda..."; box.appendChild(vload);
-      setTimeout(()=>{ vload.remove(); makeVideoFromImage(imgUrl,box); },500);
-    };
-    img.onerror=()=>{ loading.textContent="Rasm chiqmadi, 45 soniya kutib qayta urinib ko'ring."; };
+    if(shouldMakeImage(message)){
+      const h2=document.createElement("h3"); h2.textContent="🖼️ Rasm"; box.appendChild(h2);
+      const imgUrl=makeImageUrl(message);
+      const img=document.createElement("img");
+      img.src=imgUrl;
+      const loading=document.createElement("div"); loading.textContent="Rasm tayyorlanmoqda..."; box.appendChild(loading);
+      img.onload=()=>{
+        loading.remove();
+        box.appendChild(img);
+        const dl=document.createElement("a"); dl.href=imgUrl; dl.download="nonvoy.png"; dl.textContent="Rasmni yuklab olish"; box.appendChild(dl);
+        const h3=document.createElement("h3"); h3.textContent="🎬 Video"; box.appendChild(h3);
+        const vload=document.createElement("div"); vload.textContent="Video tayyorlanmoqda..."; box.appendChild(vload);
+        setTimeout(()=>{ vload.remove(); makeVideoFromImage(imgUrl,box); },500);
+      };
+      img.onerror=()=>{ loading.textContent="Rasm chiqmadi, 45 soniya kutib qayta urinib ko'ring."; };
+    }
   }catch(e){
     box.textContent="Xatolik: Qayta urinib ko'ring.";
   }
