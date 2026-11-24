@@ -13,42 +13,39 @@ export default async function handler(req, res) {
     if (!apiKey) return res.status(200).json({ reply: "XATO: GROQ_API_KEY topilmadi" });
 
     if (image) {
-      // 1-urinish - Maverick
-      let r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + apiKey },
-        body: JSON.stringify({
-          model: "meta-llama/llama-4-maverick-17b-128e-instruct",
-          messages: [
-            { role: "system", content: "Sen Nonvoy AI san. O'zbek tilida javob ber. Rasmda nima ko'rsang aniq ayt. Agar mashina bo'lsa: markasi, modeli, rangi, turi haqida ayt. Hech qachon 'rasm juda chiroyli' dema." },
-            { role: "user", content: [{ type: "text", text: message }, { type: "image_url", image_url: { url: image } }] }
-          ],
-          max_tokens: 1000, temperature: 0.3
-        })
-      });
-      let d = await r.json();
-      if (d.choices && d.choices[0]) return res.status(200).json({ reply: d.choices[0].message.content });
-
-      // 2-urinish - Scout, agar Maverick ishlamasa
-      let r2 = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + apiKey },
-        body: JSON.stringify({
-          model: "meta-llama/llama-4-scout-17b-16e-instruct",
-          messages: [
-            { role: "system", content: "Sen Nonvoy AI san. O'zbek tilida javob ber. Rasmda nima ko'rsang aniq ayt. Mashina bo'lsa markasi va modelini ayt." },
-            { role: "user", content: [{ type: "text", text: message }, { type: "image_url", image_url: { url: image } }] }
-          ],
-          max_tokens: 1000, temperature: 0.3
-        })
-      });
-      let d2 = await r2.json();
-      if (d2.choices && d2.choices[0]) return res.status(200).json({ reply: d2.choices[0].message.content });
-
-      return res.status(200).json({ reply: "RASM XATOSI: " + (d.error?.message || d2.error?.message || "model rasmni ko'ra olmadi") });
+      // Groq da hozir ishlaydigan vision modellar - tartib bilan urinadi
+      const models = [
+        "llama-3.2-90b-vision-preview",
+        "llama-3.2-11b-vision-preview",
+        "meta-llama/llama-4-scout-17b-16e-instruct"
+      ];
+      let lastError = "";
+      for (const model of models) {
+        try {
+          const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + apiKey },
+            body: JSON.stringify({
+              model: model,
+              messages: [
+                { role: "system", content: "Sen Nonvoy AI san. O'zbek tilida javob ber. Rasmda nima ko'rsang aniq ayt. Agar mashina bo'lsa: markasi, modeli, rangi, turi haqida ayt. Hech qachon 'rasm juda chiroyli' dema." },
+                { role: "user", content: [{ type: "text", text: message }, { type: "image_url", image_url: { url: image } }] }
+              ],
+              max_tokens: 1000, temperature: 0.3
+            })
+          });
+          const d = await r.json();
+          if (d.choices && d.choices[0]) {
+            return res.status(200).json({ reply: d.choices[0].message.content });
+          }
+          lastError = d.error?.message || "javob kelmadi";
+        } catch (e) {
+          lastError = e.message;
+        }
+      }
+      return res.status(200).json({ reply: "RASM XATOSI: " + lastError });
     }
 
-    // Oddiy matn
     const tr = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": "Bearer " + apiKey },
@@ -65,4 +62,4 @@ export default async function handler(req, res) {
   } catch (e) {
     return res.status(200).json({ reply: "SERVER XATOSI: " + e.message });
   }
-        }
+              }
