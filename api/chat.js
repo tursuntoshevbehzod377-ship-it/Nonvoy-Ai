@@ -1,49 +1,79 @@
+// api/chat.js - Nonvoy AI - FAQAT OpenRouter, Groq YO'Q
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
-  try {
-    const { message, image, mode } = req.body || {};
-    const text = (message || '').toString().trim();
-    const lower = text.toLowerCase();
-    const GROQ = process.env.GROQ_API_KEY;
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Faqat POST' });
 
-    // 1. RASM KELSA - FAQAT TAHLIL, GROQ BILAN
+  try {
+    const { message, image } = req.body || {};
+    const apiKey = process.env.OPENROUTER_API_KEY;
+
+    if (!apiKey) {
+      return res.status(500).json({ error: 'OPENROUTER_API_KEY topilmadi. Vercel > Settings > Environment Variables da tekshiring.' });
+    }
+
+    // 1. RASM TAHLILI - rasm yuborilgan bo'lsa
     if (image) {
-      const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST', headers: { 'Authorization': `Bearer ${GROQ}`, 'Content-Type': 'application/json' },
+      const userText = (message || '').trim() || 'Bu rasmda nima bor? Ozbek tilida batafsil tushuntir.';
+      const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + apiKey,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://nonvoy-ai.vercel.app',
+          'X-Title': 'Nonvoy AI'
+        },
         body: JSON.stringify({
-          model: 'meta-llama/llama-4-maverick-17b-128e-instruct',
-          messages: [{
-            role: 'user',
-            content: [
-              { type: 'text', text: `O'zbek tilida javob ber. Rasm chizma. Faqat rasmda nima borligini aniq ayt. Agar mashina bo'lsa marka, model, rang, yilni ayt. Savol: ${text || 'Bu rasmda nima bor?'}` },
+          model: 'openai/gpt-4o-mini',
+          messages: [
+            { role: 'system', content: 'Sen Nonvoy AI san. Faqat OZBEK tilida javob ber. Rasmda ko\'rgan narsangni aniq ayt. Ko\'rmagan narsani o\'ylab topma. Agar non bo\'lsa - qanday non, rangi, shakli, naqshi qandayligini ayt. Umumiy "rasm juda chiroyli" dema.' },
+            { role: 'user', content: [
+              { type: 'text', text: userText },
               { type: 'image_url', image_url: { url: image } }
-            ]
-          }]
+            ]}
+          ],
+          max_tokens: 800,
+          temperature: 0.3
         })
       });
-      const d = await r.json();
-      const ans = d?.choices?.[0]?.message?.content;
-      return res.status(200).json({ reply: ans || ('Groq xatosi: ' + (d?.error?.message || 'kalitni tekshir')) });
+      const data = await r.json();
+      if (!r.ok) return res.status(500).json({ error: 'Rasm tahlili xatosi: ' + (data?.error?.message || 'Server xatosi') });
+      return res.status(200).json({ reply: data.choices[0].message.content, type: 'vision' });
     }
 
-    // 2. RASM CHIZISH
-    if (mode === 'image' || /rasm chiz|chizib ber|rasm yarat/i.test(lower)) {
-      const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(text + ', beautiful, cinematic, sharp')}?width=1024&height=1024&seed=${Date.now()}&nologo=true`;
-      return res.status(200).json({ reply: 'Mana rasming:', imageUrl: url });
-    }
+    // 2. ODDIY MATN / SHER
+    const text = (message || '').trim();
+    if (!text) return res.status(400).json({ error: 'Xabar bo\'sh' });
 
-    // 3. MATN
-    const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST', headers: { 'Authorization': `Bearer ${GROQ}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'openai/gpt-oss-120b', messages: [{ role: 'system', content: `Sen Nonvoy AI san. O'zbek tilida javob ber.` }, { role: 'user', content: text }] })
+    const isPoem = /sher|she\'r|ona haqida/i.test(text);
+
+    const r2 = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + apiKey,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://nonvoy-ai.vercel.app',
+        'X-Title': 'Nonvoy AI'
+      },
+      body: JSON.stringify({
+        model: 'openai/gpt-4o-mini',
+        messages: [
+          { role: 'system', content: isPoem
+            ? 'Sen o\'zbek shoirisan. Faqat OZBEK tilida yoz. Sher 4 band, har bandda 4 qator bo\'lsin. Qofiya mos, mazmuni bog\'liq bo\'lsin. Ruscha va inglizcha so\'z qo\'shma.'
+            : 'Sen Nonvoy AI san. Faqat OZBEK tilida, qisqa, tushunarli, samimiy javob ber. Ruscha yozma.' },
+          { role: 'user', content: text }
+        ],
+        max_tokens: 1000,
+        temperature: isPoem ? 0.7 : 0.5
+      })
     });
-    const d = await r.json();
-    const ans = d?.choices?.[0]?.message?.content;
-    return res.status(200).json({ reply: ans || ('Groq xatosi: ' + (d?.error?.message || 'kalitni tekshir')) });
+    const data2 = await r2.json();
+    if (!r2.ok) return res.status(500).json({ error: 'Xato: ' + (data2?.error?.message || 'Server xatosi') });
+    return res.status(200).json({ reply: data2.choices[0].message.content, type: 'text' });
+
   } catch (e) {
-    return res.status(200).json({ reply: 'Xato: ' + e.message });
+    return res.status(500).json({ error: 'Server xatosi: ' + e.message });
   }
-}
+            }
