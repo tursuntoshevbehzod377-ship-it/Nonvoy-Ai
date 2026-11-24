@@ -5,307 +5,130 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nonvoy AI</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#fff;color:#111;display:flex;flex-direction:column;min-height:100vh}
+*{box-sizing:border-box} body{margin:0;font-family:Arial,sans-serif;background:#fff;color:#111;display:flex;flex-direction:column;min-height:100vh}
 header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;position:fixed;top:0;left:0;right:0;background:#fff;z-index:50}
-.header-left{display:flex;align-items:center;gap:10px}
 .menu-btn{width:44px;height:44px;border-radius:50%;border:none;background:#f1f1f1;font-size:22px}
 .header-title{font-size:20px;font-weight:500}
 .glasses-btn{border:none;background:#f1f1f1;border-radius:999px;padding:10px 16px;font-size:15px}
-#sidebar{position:fixed;top:0;left:-260px;width:250px;height:100%;background:#fff;box-shadow:2px 0 10px rgba(0,0,0,0.15);padding:20px;transition:0.3s;z-index:99}
-#sidebar.open{left:0}
-#sidebar h3{margin-top:0}
-#sidebar button{display:block;width:100%;padding:12px;margin:8px 0;border:none;border-radius:12px;background:#f1f1f1;text-align:left;font-size:15px}
-#overlay{position:fixed;inset:0;background:rgba(0,0,0,0.3);display:none;z-index:90}
-#overlay.show{display:block}
-#dotsMenu{position:fixed;top:60px;right:14px;background:#fff;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,0.15);padding:8px;display:none;z-index:99;width:180px}
-#dotsMenu.show{display:block}
-#dotsMenu button{display:block;width:100%;padding:12px;border:none;background:none;text-align:left;font-size:15px}
+#sidebar{position:fixed;top:0;left:-260px;width:250px;height:100%;background:#fff;box-shadow:2px 0 10px rgba(0,0,0,.15);padding:20px;transition:.3s;z-index:99}
+#sidebar.open{left:0} #sidebar button{display:block;width:100%;padding:12px;margin:8px 0;border:none;border-radius:12px;background:#f1f1f1;text-align:left;font-size:15px}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);display:none;z-index:90} #overlay.show{display:block}
+#dotsMenu{position:fixed;top:60px;right:14px;background:#fff;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,.15);padding:8px;display:none;z-index:99;width:180px}
+#dotsMenu.show{display:block} #dotsMenu button{display:block;width:100%;padding:12px;border:none;background:none;text-align:left;font-size:15px}
 main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin:70px auto 0 auto;padding:10px;padding-bottom:170px}
-.logo-wrap{text-align:center;margin:70px 0 20px 0}
-.logo-img{width:160px;height:160px;object-fit:cover;border-radius:50%;border:4px solid #f5c542;box-shadow:0 10px 25px rgba(0,0,0,0.18)}
-.logo-text{font-size:24px;font-weight:bold;margin-top:12px}
-.logo-sub{color:#888;font-size:14px}
-#chat{flex:1;display:flex;flex-direction:column;gap:12px;overflow-y:auto;padding-bottom:10px}
+.logo-wrap{text-align:center;margin:70px 0 20px 0} .logo-img{width:160px;height:160px;object-fit:cover;border-radius:50%;border:4px solid #f5c542;box-shadow:0 10px 25px rgba(0,0,0,.18)}
+.logo-text{font-size:24px;font-weight:bold;margin-top:12px} .logo-sub{color:#888;font-size:14px}
+#chat{flex:1;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
 .message{max-width:92%;padding:12px 14px;border-radius:18px;line-height:1.5;word-wrap:break-word}
-.message.user{background:#e8f5e9;align-self:flex-end}
-.message.ai{background:#f1f1f1;align-self:flex-start}
+.message.user{background:#e8f5e9;align-self:flex-end} .message.ai{background:#f1f1f1;align-self:flex-start}
 .message img,.message video,.message canvas{width:100%;border-radius:14px;margin-top:10px}
-.message.ai a{color:#0a7a42;display:block;margin-top:6px}
 .message.ai h3{margin:10px 0 4px 0;font-size:15px;color:#0a7a42}
 .bottom-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:10px 12px 16px 12px;z-index:50}
-.input-box{max-width:700px;margin:0 auto;display:flex;flex-direction:column;background:#fff;border:1px solid #e5e5e5;border-radius:24px;box-shadow:0 4px 20px rgba(0,0,0,0.08);padding:10px}
-.input-row{display:flex;align-items:center;gap:8px}
-#msg{flex:1;border:none;outline:none;font-size:17px;padding:10px;background:transparent}
+.input-box{max-width:700px;margin:0 auto;display:flex;flex-direction:column;background:#fff;border:1px solid #e5e5e5;border-radius:24px;box-shadow:0 4px 20px rgba(0,0,0,.08);padding:10px}
+#msg{flex:1;border:none;outline:none;font-size:17px;padding:10px;background:transparent;width:100%}
 .plus-btn{width:42px;height:42px;min-width:42px;border-radius:50%;border:1px solid #ddd;background:#fff;font-size:24px;display:flex;align-items:center;justify-content:center}
-.mode-btn{border:1px solid #ddd;background:#fff;border-radius:999px;padding:8px 14px;font-size:14px}
-.mode-btn.active{background:#111;color:#fff;border-color:#111}
-.send-btn{width:48px;height:48px;min-width:48px;border-radius:50%;border:none;background:#111;color:#fff;font-size:22px;cursor:pointer}
+.mode-btn{border:1px solid #ddd;background:#fff;border-radius:999px;padding:8px 14px;font-size:14px} .mode-btn.active{background:#111;color:#fff}
+.send-btn{width:48px;height:48px;min-width:48px;border-radius:50%;border:none;background:#111;color:#fff;font-size:22px}
 .hint{font-size:12px;color:#888;text-align:center;margin-top:4px}
-#previewBox{display:none;position:relative;margin-top:8px}
-#previewBox img{width:90px;height:90px;object-fit:cover;border-radius:12px}
-#removeImg{position:absolute;top:-8px;left:82px;width:26px;height:26px;border-radius:50%;border:none;background:#111;color:#fff;font-size:14px}
+#previewBox{display:none;position:relative;margin-top:8px} #previewBox img{width:90px;height:90px;object-fit:cover;border-radius:12px}
+#removeImg{position:absolute;top:-8px;left:82px;width:26px;height:26px;border-radius:50%;border:none;background:#111;color:#fff}
 </style>
 </head>
 <body>
 <div id="overlay" onclick="closeAll()"></div>
-<div id="sidebar">
-<h3>Nonvoy AI</h3>
-<button type="button" onclick="newChat()">✨ Yangi suhbat</button>
-<button type="button" onclick="closeAll()">💬 Suhbatlar</button>
-<button type="button" onclick="closeAll()">🖼️ Rasmlarim</button>
-<button type="button" onclick="closeAll()">🎬 Videolarim</button>
-<button type="button" onclick="closeAll()">⚙️ Sozlamalar</button>
-</div>
-<div id="dotsMenu">
-<button type="button" onclick="newChat()">✨ Yangi suhbat</button>
-<button type="button" onclick="alert('Ulashish tez orada')">🔗 Ulashish</button>
-<button type="button" onclick="alert('Nonvoy AI v2.0')">ℹ️ Sayt haqida</button>
-</div>
-<header>
-<div class="header-left">
-<button type="button" class="menu-btn" onclick="openSidebar()">☰</button>
-<span class="header-title">Nonvoy AI</span>
-</div>
-<div style="display:flex;gap:8px;align-items:center">
-<button type="button" class="glasses-btn" onclick="alert('Glasses tez orada')">👓 Glasses</button>
-<button type="button" class="menu-btn" onclick="toggleDots()">⋮</button>
-</div>
-</header>
+<div id="sidebar"><h3>Nonvoy AI</h3><button onclick="newChat()">✨ Yangi suhbat</button><button onclick="closeAll()">💬 Suhbatlar</button><button onclick="closeAll()">🖼️ Rasmlarim</button><button onclick="closeAll()">🎬 Videolarim</button><button onclick="closeAll()">⚙️ Sozlamalar</button></div>
+<div id="dotsMenu"><button onclick="newChat()">✨ Yangi suhbat</button><button onclick="alert('Nonvoy AI v2.0')">ℹ️ Sayt haqida</button></div>
+<header><div style="display:flex;align-items:center;gap:10px"><button class="menu-btn" onclick="openSidebar()">☰</button><span class="header-title">Nonvoy AI</span></div><div style="display:flex;gap:8px"><button class="glasses-btn" onclick="alert('Glasses tez orada')">👓 Glasses</button><button class="menu-btn" onclick="toggleDots()">⋮</button></div></header>
 <main>
-<div class="logo-wrap" id="logoWrap">
-<img class="logo-img" src="https://image.pollinations.ai/prompt/beautiful%20traditional%20Fergana%20Valley%20uzbek%20non%20bread%2C%20round%20golden%20crispy%20lepeshka%20with%20beautiful%20pattern%20in%20middle%2C%20fresh%20from%20tandir%2C%20on%20white%20background%2C%20professional%20food%20photography%2C%20very%20appetizing%2C%20warm%20light?width=600&height=600&seed=777&nologo=true&model=flux" alt="Vodiy Noni">
-<div class="logo-text">Nonvoy AI</div>
-<div class="logo-sub">Vodiy nonidek issiq va chiroyli ✨</div>
-</div>
+<div class="logo-wrap" id="logoWrap"><img class="logo-img" src="https://image.pollinations.ai/prompt/beautiful%20traditional%20Fergana%20Valley%20uzbek%20non%20bread%2C%20round%20golden%20crispy%20lepeshka%20with%20beautiful%20pattern%2C%20fresh%20from%20tandir%2C%20on%20white%20background%2C%20professional%20food%20photography?width=600&height=600&seed=777&nologo=true&model=flux"><div class="logo-text">Nonvoy AI</div><div class="logo-sub">Vodiy nonidek issiq va chiroyli ✨</div></div>
 <div id="chat"></div>
 </main>
-<div class="bottom-bar">
-<div class="input-box">
-<div class="input-row">
+<div class="bottom-bar"><div class="input-box">
 <input id="msg" placeholder="Ask Nonvoy AI... yoki rasm yuborib so'rang" autocomplete="off">
-</div>
-<div id="previewBox">
-<img id="previewImg" src="">
-<button type="button" id="removeImg">✕</button>
-<div style="font-size:12px;color:#0a7a42;margin-top:2px">✅ Rasm tanlandi — savol yozib yuboring</div>
-</div>
-<div class="input-row" style="justify-content:space-between;margin-top:8px">
-<button type="button" class="plus-btn" id="plusBtn">+</button>
-<input type="file" id="fileInput" accept="image/*" style="display:none">
-<div style="display:flex;gap:6px;align-items:center">
-<button type="button" id="imgBtn" class="mode-btn">🖼️ Rasm</button>
-<button type="button" id="vidBtn" class="mode-btn">🎬 Video</button>
-<button type="button" id="sendBtn" class="send-btn">↑</button>
-</div>
-</div>
-<div class="hint" id="hint">+ ni bosib rasm yuboring — tahlil qilib beradi</div>
-</div>
-<div style="text-align:center;color:#aaa;font-size:12px;margin-top:6px">Nonvoy AI © 2026</div>
-</div>
+<div id="previewBox"><img id="previewImg" src=""><button id="removeImg">✕</button><div style="font-size:12px;color:#0a7a42">✅ Rasm tanlandi</div></div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+<button class="plus-btn" id="plusBtn">+</button><input type="file" id="fileInput" accept="image/*" style="display:none">
+<div style="display:flex;gap:6px"><button id="imgBtn" class="mode-btn">🖼️ Rasm</button><button id="vidBtn" class="mode-btn">🎬 Video</button><button id="sendBtn" class="send-btn">↑</button></div>
+</div><div class="hint" id="hint">+ ni bosib rasm yuboring — tahlil qilib beradi</div>
+</div><div style="text-align:center;color:#aaa;font-size:12px;margin-top:6px">Nonvoy AI © 2026</div></div>
 <script>
-var chat=document.getElementById("chat");
-var input=document.getElementById("msg");
-var sendBtn=document.getElementById("sendBtn");
-var imgBtn=document.getElementById("imgBtn");
-var vidBtn=document.getElementById("vidBtn");
-var hint=document.getElementById("hint");
-var history=[];
-var wantImage=false;
-var wantVideo=false;
-var selectedImage=null;
-function openSidebar(){ document.getElementById("sidebar").classList.add("open"); document.getElementById("overlay").classList.add("show"); }
-function toggleDots(){ document.getElementById("dotsMenu").classList.toggle("show"); }
-function closeAll(){ document.getElementById("sidebar").classList.remove("open"); document.getElementById("overlay").classList.remove("show"); document.getElementById("dotsMenu").classList.remove("show"); }
-function newChat(){ chat.innerHTML=""; document.getElementById("logoWrap").style.display="block"; history=[]; selectedImage=null; document.getElementById("previewBox").style.display="none"; closeAll(); }
-function updateHint(){
-  if(selectedImage) hint.textContent="Rasm tanlandi — savol yozib yuboring";
-  else if(wantImage && wantVideo) hint.textContent="Rasm + Video rejimi";
-  else if(wantImage) hint.textContent="Rasm rejimi — rasm ham chiqadi";
-  else if(wantVideo) hint.textContent="Video rejimi — video ham chiqadi";
-  else hint.textContent="+ ni bosib rasm yuboring — tahlil qilib beradi";
-}
-imgBtn.addEventListener("click",function(){ wantImage=!wantImage; imgBtn.classList.toggle("active",wantImage); updateHint(); input.focus(); });
-vidBtn.addEventListener("click",function(){ wantVideo=!wantVideo; vidBtn.classList.toggle("active",wantVideo); if(wantVideo){ wantImage=true; imgBtn.classList.add("active"); } updateHint(); input.focus(); });
-document.getElementById("plusBtn").addEventListener("click",function(){ document.getElementById("fileInput").click(); });
-document.getElementById("fileInput").addEventListener("change",function(e){
+var chat=document.getElementById("chat"),input=document.getElementById("msg"),sendBtn=document.getElementById("sendBtn"),imgBtn=document.getElementById("imgBtn"),vidBtn=document.getElementById("vidBtn"),hint=document.getElementById("hint");
+var history=[],wantImage=false,wantVideo=false,selectedImage=null;
+function openSidebar(){document.getElementById("sidebar").classList.add("open");document.getElementById("overlay").classList.add("show");}
+function toggleDots(){document.getElementById("dotsMenu").classList.toggle("show");}
+function closeAll(){document.getElementById("sidebar").classList.remove("open");document.getElementById("overlay").classList.remove("show");document.getElementById("dotsMenu").classList.remove("show");}
+function newChat(){chat.innerHTML="";document.getElementById("logoWrap").style.display="block";history=[];selectedImage=null;document.getElementById("previewBox").style.display="none";closeAll();}
+function updateHint(){if(selectedImage)hint.textContent="Rasm tanlandi — savol yozib yuboring";else if(wantImage)hint.textContent="Rasm rejimi";else hint.textContent="+ ni bosib rasm yuboring — tahlil qilib beradi";}
+imgBtn.onclick=function(){wantImage=!wantImage;imgBtn.classList.toggle("active",wantImage);updateHint();};
+vidBtn.onclick=function(){wantVideo=!wantVideo;vidBtn.classList.toggle("active",wantVideo);if(wantVideo){wantImage=true;imgBtn.classList.add("active");}updateHint();};
+document.getElementById("plusBtn").onclick=function(){document.getElementById("fileInput").click();};
+document.getElementById("fileInput").onchange=function(e){
   var f=e.target.files[0]; if(!f) return;
   var reader=new FileReader();
   reader.onload=function(ev){
-    selectedImage=ev.target.result;
-    document.getElementById("previewImg").src=selectedImage;
-    document.getElementById("previewBox").style.display="block";
-    input.placeholder="Bu rasm haqida nima so'raysiz?";
-    input.focus(); updateHint();
+    // RASIMNI KICHIKLASHTIRAMIZ - eng muhim joy
+    var img=new Image();
+    img.onload=function(){
+      var canvas=document.createElement("canvas");
+      var max=800, w=img.width, h=img.height;
+      if(w>max){ h=h*max/w; w=max; }
+      if(h>max){ w=w*max/h; h=max; }
+      canvas.width=w; canvas.height=h;
+      canvas.getContext("2d").drawImage(img,0,0,w,h);
+      selectedImage=canvas.toDataURL("image/jpeg",0.7);
+      document.getElementById("previewImg").src=selectedImage;
+      document.getElementById("previewBox").style.display="block";
+      input.placeholder="Bu rasm haqida nima so'raysiz?"; input.focus(); updateHint();
+    };
+    img.src=ev.target.result;
   };
   reader.readAsDataURL(f);
-});
-document.getElementById("removeImg").addEventListener("click",function(){
-  selectedImage=null; document.getElementById("previewBox").style.display="none"; document.getElementById("fileInput").value=""; input.placeholder="Ask Nonvoy AI... yoki rasm yuborib so'rang"; updateHint();
-});
-function addMessage(text,type){
-  document.getElementById("logoWrap").style.display="none";
-  var div=document.createElement("div");
-  div.className="message "+type;
-  div.textContent=text;
-  chat.appendChild(div);
-  chat.scrollTop=chat.scrollHeight;
-  return div;
-}
-function cleanReply(t){
-  t=t.replace(/```[\s\S]*?```/g,"").replace(/`{1,3}/g,"").replace(/\*\*/g,"").replace(/!\[.*?\]\(.*?\)/g,"").replace(/\[.*?\]\(.*?\)/g,"");
-  return t.trim();
-}
-function shouldMakeImage(msg){
-  if(wantImage || wantVideo) return true;
-  var t=msg.toLowerCase().trim();
-  if(t.indexOf("rasm")>=0 || t.indexOf("surat")>=0 || t.indexOf("foto")>=0 || t.indexOf("chiz")>=0 || t.indexOf("yarat")>=0 || t.indexOf("video")>=0) return true;
-  if(t.indexOf("salom")===0 || t.indexOf("assalom")===0) return false;
-  if(t.indexOf("?")>=0) return false;
-  return false;
-}
-function translate(prompt){
-  var e=prompt;
-  e=e.replace(/rasm/gi," ").replace(/chizib/gi," ").replace(/chiz/gi," ").replace(/yarat/gi," ").replace(/ber/gi," ").replace(/tasvir/gi," ").replace(/surat/gi," ");
-  var dict={qizil:"red",mashina:"car",mushuk:"cat",it:"dog",uy:"house",gul:"flower",tog:"mountain",dengiz:"sea",qiz:"girl",bola:"boy",shahar:"city",osmon:"sky",quyosh:"sun",oy:"moon",daraxt:"tree",at:"horse",qush:"bird",olma:"apple",kitob:"book",telefon:"phone",robot:"robot",samolyot:"airplane",poezd:"train",kema:"ship",qor:"snow",non:"uzbek bread"};
-  Object.keys(dict).forEach(function(k){ e=e.split(k).join(dict[k]); });
-  e=e.trim();
-  if(!e) e="beautiful landscape";
-  return "beautiful, highly detailed, cinematic lighting, ultra realistic, professional photography, "+e;
-}
-function makeImageUrl(prompt){
-  return "https://image.pollinations.ai/prompt/"+encodeURIComponent(translate(prompt))+"?width=1024&height=1024&seed="+Math.floor(Math.random()*999999)+"&nologo=true&model=flux";
-}
-function downloadImage(url,box){
-  var a=document.createElement("a");
-  a.textContent="⬇️ Rasmni yuklab olish";
-  a.href="#";
-  a.onclick=function(ev){
-    ev.preventDefault();
-    a.textContent="Yuklanmoqda...";
-    fetch(url).then(function(r){ return r.blob(); }).then(function(blob){
-      var u=URL.createObjectURL(blob);
-      var link=document.createElement("a"); link.href=u; link.download="nonvoy-rasm.jpg"; document.body.appendChild(link); link.click(); link.remove();
-      a.textContent="✅ Yuklab olindi";
-    }).catch(function(){ window.open(url,"_blank"); a.textContent="⬇️ Yangi oynada ochildi, ushlab turib saqlang"; });
-  };
-  box.appendChild(a);
-}
-function makeVideoFromImage(imgUrl,box){
-  var img=new Image();
-  img.crossOrigin="anonymous";
-  img.src=imgUrl;
-  img.onload=function(){
-    var canvas=document.createElement("canvas");
-    canvas.width=640; canvas.height=640;
-    box.appendChild(canvas);
-    var ctx=canvas.getContext("2d");
-    var stream=canvas.captureStream(30);
-    var chunks=[];
-    var mime="video/webm";
-    if(MediaRecorder.isTypeSupported("video/webm;codecs=vp9")) mime="video/webm;codecs=vp9";
-    var rec=new MediaRecorder(stream,{mimeType:mime});
-    rec.ondataavailable=function(e){ if(e.data.size>0) chunks.push(e.data); };
-    rec.onstop=function(){
-      var blob=new Blob(chunks,{type:"video/webm"});
-      var url=URL.createObjectURL(blob);
-      var v=document.createElement("video");
-      v.src=url; v.controls=true; v.loop=true; v.autoplay=true; v.playsInline=true; v.muted=true;
-      box.appendChild(v);
-      var dl=document.createElement("a");
-      dl.href=url; dl.download="nonvoy-video.webm"; dl.textContent="Videoni yuklab olish";
-      box.appendChild(dl);
-    };
-    var start=performance.now();
-    rec.start(250);
-    function draw(now){
-      var t=(now-start)/5000;
-      if(t>=1){ rec.stop(); return; }
-      var zoom=1+t*0.35;
-      var w=640*zoom, h=640*zoom;
-      var x=(640-w)/2 + Math.sin(t*3)*20;
-      var y=(640-h)/2;
-      ctx.fillStyle="#000"; ctx.fillRect(0,0,640,640);
-      ctx.drawImage(img,x,y,w,h);
-      requestAnimationFrame(draw);
-    }
-    requestAnimationFrame(draw);
-  };
-}
-function showImageVideo(message,box,doVideo){
-  var h2=document.createElement("h3"); h2.textContent="🖼️ Rasm"; box.appendChild(h2);
-  var imgUrl=makeImageUrl(message);
-  var img=document.createElement("img");
-  img.src=imgUrl;
-  var loading=document.createElement("div"); loading.textContent="Rasm tayyorlanmoqda..."; box.appendChild(loading);
-  img.onload=function(){
-    loading.remove();
-    box.appendChild(img);
-    downloadImage(imgUrl,box);
-    if(doVideo){
-      var h3=document.createElement("h3"); h3.textContent="🎬 Video"; box.appendChild(h3);
-      var vload=document.createElement("div"); vload.textContent="Video tayyorlanmoqda..."; box.appendChild(vload);
-      setTimeout(function(){ vload.remove(); makeVideoFromImage(imgUrl,box); },500);
-    }
-  };
-  img.onerror=function(){ loading.textContent="Rasm chiqmadi. 45 soniya kutib qayta urinib koring."; };
+};
+document.getElementById("removeImg").onclick=function(){selectedImage=null;document.getElementById("previewBox").style.display="none";document.getElementById("fileInput").value="";updateHint();};
+function addMessage(text,type){document.getElementById("logoWrap").style.display="none";var d=document.createElement("div");d.className="message "+type;d.textContent=text;chat.appendChild(d);chat.scrollTop=chat.scrollHeight;return d;}
+function cleanReply(t){return t.replace(/```[\s\S]*?```/g,"").replace(/`/g,"").replace(/\*\*/g,"").trim();}
+function shouldMakeImage(msg){if(wantImage||wantVideo)return true;var t=msg.toLowerCase();if(t.indexOf("rasm")>=0||t.indexOf("chiz")>=0||t.indexOf("yarat")>=0)return true;if(t.indexOf("?")>=0)return false;return false;}
+function translate(p){var low=p.toLowerCase();if(low.indexOf("suniy intelekt")>=0||low.indexOf("suniy intellekt")>=0)return "futuristic artificial intelligence robot with glowing blue brain, digital hologram, futuristic city, cinematic";var e=p.replace(/rasm/gi," ").replace(/chiz/gi," ").replace(/yarat/gi," ").replace(/ber/gi," ");var dict={qizil:"red",mashina:"car",mushuk:"cat",it:"dog",uy:"house",gul:"flower",tog:"mountain",dengiz:"sea",qiz:"girl",bola:"boy",shahar:"city",osmon:"sky",non:"uzbek bread",robot:"robot"};Object.keys(dict).forEach(function(k){e=e.split(k).join(dict[k]);});e=e.trim();if(!e)e="beautiful landscape";return "beautiful, highly detailed, cinematic lighting, ultra realistic, "+e;}
+function makeImageUrl(p){return "https://image.pollinations.ai/prompt/"+encodeURIComponent(translate(p))+"?width=1024&height=1024&seed="+Math.floor(Math.random()*999999)+"&nologo=true&model=flux";}
+function showImageVideo(msg,box,doVideo){
+  var h2=document.createElement("h3");h2.textContent="🖼️ Rasm";box.appendChild(h2);
+  var imgUrl=makeImageUrl(msg);var img=document.createElement("img");img.src=imgUrl;
+  var load=document.createElement("div");load.textContent="Rasm tayyorlanmoqda...";box.appendChild(load);
+  img.onload=function(){load.remove();box.appendChild(img);};
+  img.onerror=function(){load.textContent="Rasm chiqmadi. 45 soniya kutib qayta urining.";};
 }
 async function send(){
   var message=input.value.trim();
-  // RASM TAHLILI - rasm tanlangan bo'lsa
   if(selectedImage){
-    var q=message || "Bu rasmni tahlil qilib ber. Nima ko'rinayapti?";
-    var userDiv=document.createElement("div"); userDiv.className="message user";
-    userDiv.textContent=q;
-    var uimg=document.createElement("img"); uimg.src=selectedImage; userDiv.appendChild(uimg);
-    document.getElementById("logoWrap").style.display="none"; chat.appendChild(userDiv); chat.scrollTop=chat.scrollHeight;
-    var imgToSend=selectedImage; selectedImage=null;
-    document.getElementById("previewBox").style.display="none"; document.getElementById("fileInput").value=""; input.value=""; input.placeholder="Ask Nonvoy AI... yoki rasm yuborib so'rang"; updateHint();
-    var box=addMessage("","ai"); box.textContent="Rasmni ko'ryapman...";
+    var q=message||"Bu rasmni tahlil qilib ber. Nima ko'rinayapti?";
+    var ud=document.createElement("div");ud.className="message user";ud.textContent=q;var uimg=document.createElement("img");uimg.src=selectedImage;ud.appendChild(uimg);
+    document.getElementById("logoWrap").style.display="none";chat.appendChild(ud);chat.scrollTop=chat.scrollHeight;
+    var imgToSend=selectedImage;selectedImage=null;document.getElementById("previewBox").style.display="none";document.getElementById("fileInput").value="";input.value="";updateHint();
+    var box=addMessage("","ai");box.textContent="Rasmni ko'ryapman...";
     try{
-      var resp=await fetch("/api/chat",{ method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ message: q, history: history, image: imgToSend }) });
+      var resp=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:q,history:history,image:imgToSend})});
       var d=await resp.json();
       box.textContent="";
-      var h=document.createElement("h3"); h.textContent="🔍 Rasm tahlili"; box.appendChild(h);
-      var p=document.createElement("div"); p.textContent=cleanReply(d.reply||"Rasmni ko'rdim, chiroyli ekan!"); box.appendChild(p);
+      var h=document.createElement("h3");h.textContent="🔍 Rasm tahlili";box.appendChild(h);
+      var p=document.createElement("div");p.textContent=cleanReply(d.reply||"Javob kelmadi");box.appendChild(p);
       history.push({role:"user",content:q},{role:"assistant",content:d.reply||""});
-    }catch(e){ box.textContent="Rasmni ko'rdim, chiroyli ekan! Yana bir bor yuborib ko'ring."; }
+    }catch(e){ box.textContent="XATO: Serverga ulanmadim. Sabab: "+e.message; }
     input.focus(); return;
   }
   if(!message) return;
-  var doImage=shouldMakeImage(message);
-  var doVideo=wantVideo;
-  input.value="";
-  addMessage(message,"user");
-  var box2=addMessage("","ai");
-  box2.textContent="Tayyorlanmoqda...";
-  if(doImage){
-    box2.textContent="";
-    var h0=document.createElement("h3"); h0.textContent="💬 Matn"; box2.appendChild(h0);
-    var p0=document.createElement("div"); p0.textContent="Mana, rasmingizni tayyorladim!"; box2.appendChild(p0);
-    showImageVideo(message,box2,doVideo);
-    history.push({role:"user",content:message},{role:"assistant",content:"Rasm tayyorlandi"});
-    input.focus();
-    return;
-  }
-  var reply="";
+  var doImage=shouldMakeImage(message);var doVideo=wantVideo;input.value="";addMessage(message,"user");
+  var box2=addMessage("","ai");box2.textContent="Tayyorlanmoqda...";
+  if(doImage){box2.textContent="";var h0=document.createElement("h3");h0.textContent="💬 Matn";box2.appendChild(h0);var p0=document.createElement("div");p0.textContent="Mana, rasmingizni tayyorladim!";box2.appendChild(p0);showImageVideo(message,box2,doVideo);input.focus();return;}
   try{
-    var controller=new AbortController();
-    var timer=setTimeout(function(){ controller.abort(); }, 20000);
-    var response=await fetch("/api/chat",{ method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({message:message,history:history}), signal: controller.signal });
-    clearTimeout(timer);
-    var data=await response.json();
-    reply=cleanReply(data.reply || "");
-  }catch(e){ reply=""; }
-  if(!reply) reply="Tushundim. Savolingizni yozing, yordam beraman.";
-  box2.textContent="";
-  var h1=document.createElement("h3"); h1.textContent="💬 Matn"; box2.appendChild(h1);
-  var p=document.createElement("div"); p.textContent=reply; box2.appendChild(p);
-  history.push({role:"user",content:message},{role:"assistant",content:reply});
+    var r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:message,history:history})});
+    var data=await r.json();var reply=cleanReply(data.reply||"Javob kelmadi");
+    box2.textContent="";var h1=document.createElement("h3");h1.textContent="💬 Matn";box2.appendChild(h1);var pp=document.createElement("div");pp.textContent=reply;box2.appendChild(pp);
+    history.push({role:"user",content:message},{role:"assistant",content:reply});
+  }catch(e){ box2.textContent="XATO: "+e.message; }
   input.focus();
 }
-sendBtn.addEventListener("click",send);
-input.addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); send(); } });
+sendBtn.onclick=send;
+input.onkeydown=function(e){if(e.key==="Enter"){e.preventDefault();send();}};
 </script>
 </body>
 </html>
