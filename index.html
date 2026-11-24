@@ -18,27 +18,34 @@ h1{font-size:22px}
 .me{align-self:flex-end;background:#d3f8d3}
 .ai{align-self:flex-start;background:#f1f1f1}
 .bubble img{width:100%;border-radius:12px;margin-top:10px;display:block;max-height:400px;object-fit:cover;cursor:zoom-in}
-.bubble img:active{opacity:.9}
 .label{font-weight:700;margin-bottom:6px;font-size:14px}
 .label.green{color:#0a7a2a}
 .ask-box{background:#fff7d6;border:1px solid #f5d76e;padding:12px;border-radius:14px}
 .ask-box b{color:#8a6d00}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .chip{border:1px solid #ddd;background:#fff;padding:8px 12px;border-radius:20px;cursor:pointer;font-size:14px}
+.music-box{background:#f0eaff;border:1px solid #d5c8ff;padding:14px;border-radius:14px;margin-top:8px}
+.music-box h3{margin-bottom:8px}
+.lyrics{background:#fff;padding:12px;border-radius:10px;margin-top:10px;line-height:1.7;font-style:italic;white-space:pre-wrap}
+.mbtn{border:none;padding:10px 16px;border-radius:20px;cursor:pointer;font-size:15px;margin-right:8px;margin-top:8px}
+.mbtn.play{background:#6a1bff;color:#fff}
+.mbtn.dl{background:#fff;border:1px solid #6a1bff;color:#6a1bff}
+.mbtn.stop{background:#111;color:#fff}
 footer{padding:10px 12px 14px;border-top:1px solid #eee;background:#fff}
 .input-wrap{display:flex;align-items:center;gap:8px;background:#f1f1f1;border-radius:30px;padding:6px 6px 6px 12px}
 #plus{width:38px;height:38px;border-radius:50%;border:none;background:#fff;font-size:22px;cursor:pointer;flex-shrink:0}
 #inp{flex:1;border:none;outline:none;background:transparent;font-size:16px;padding:10px 0}
 #send{width:42px;height:42px;border-radius:50%;border:none;background:#111;color:#fff;font-size:20px;cursor:pointer;flex-shrink:0}
-.modes{display:flex;gap:8px;justify-content:center;margin-top:8px}
-.mode{border:1px solid #ddd;background:#fff;padding:6px 12px;border-radius:20px;font-size:13px;cursor:pointer}
-.mode.on{background:#111;color:#fff}
+/* ✅ UCHTA TUGMA - HAMMASI BIR XIL */
+.modes{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.mode{border:1px solid #ddd;background:#fff;padding:9px 16px;border-radius:20px;font-size:14px;cursor:pointer;font-weight:600}
+.mode.on{background:#111;color:#fff;border-color:#111}
+.mode.music-on{background:#6a1bff;color:#fff;border-color:#6a1bff}
 .hint{text-align:center;font-size:12px;color:#888;margin-top:6px}
 #fileInput{display:none}
 .preview-box{margin:8px 12px 0;display:none}
 .preview-box img{width:80px;height:80px;object-fit:cover;border-radius:12px;border:2px solid #f5b301}
 .preview-box span{font-size:13px;color:#555;margin-left:8px}
-/* ✅ RASMNI KATTALASHTIRISH - bosganda to'liq ekran */
 #lightbox{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.92);z-index:100;align-items:center;justify-content:center;flex-direction:column;padding:16px}
 #lightbox.show{display:flex}
 #lightbox img{max-width:100%;max-height:85vh;border-radius:12px;object-fit:contain}
@@ -50,7 +57,7 @@ footer{padding:10px 12px 14px;border-top:1px solid #eee;background:#fff}
 
 <header>
   <div class="left">
-    <button class="menu" onclick="alert('Nonvoy AI')">☰</button>
+    <button class="menu" onclick="alert('Nonvoy AI\nMatn, Rasm, Video, Musiqa')">☰</button>
     <svg class="logo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#e8a400"/><circle cx="50" cy="50" r="44" fill="#f5b301"/><circle cx="50" cy="50" r="36" fill="#f9c83a"/><circle cx="50" cy="50" r="16" fill="#c98a00"/><circle cx="50" cy="50" r="16" fill="none" stroke="#8a5a00" stroke-width="1" stroke-dasharray="3 3"/><g stroke="#8a5a00" stroke-width="2" fill="none"><path d="M50 14 L50 30 M50 70 L50 86 M14 50 L30 50 M70 50 L86 50 M25 25 L36 36 M64 64 L75 75 M75 25 L64 36 M36 64 L25 75"/><circle cx="50" cy="50" r="8" fill="#a06a00"/></g><g fill="#3a2400"><circle cx="42" cy="42" r="1.5"/><circle cx="58" cy="42" r="1.5"/><circle cx="42" cy="58" r="1.5"/><circle cx="58" cy="58" r="1.5"/><circle cx="50" cy="34" r="1.5"/><circle cx="50" cy="66" r="1.5"/></g></svg>
     <h1>Nonvoy AI</h1>
   </div>
@@ -70,15 +77,16 @@ footer{padding:10px 12px 14px;border-top:1px solid #eee;background:#fff}
     <input id="inp" placeholder="Xabar yozing..." autocomplete="off">
     <button id="send">↑</button>
   </div>
+  <!-- ✅ UCHTA KNOPKA - RASM, VIDEO, MUSIQA -->
   <div class="modes">
     <button class="mode on" id="modeRasm" onclick="setMode('rasm')">🖼️ Rasm</button>
     <button class="mode" id="modeVideo" onclick="setMode('video')">🎬 Video</button>
+    <button class="mode" id="modeMusic" onclick="setMode('music')">🎵 Musiqa</button>
   </div>
-  <div class="hint">+ ni bosib rasm yuboring — tahlil qilib beradi • Rasm ustiga bossangiz kattalashadi</div>
+  <div class="hint">Tugmani tanla: Rasm, Video yoki Musiqa</div>
 </footer>
 <input type="file" id="fileInput" accept="image/*">
 
-<!-- KATTA RASM OYNASI -->
 <div id="lightbox">
   <button id="lightboxClose">✕</button>
   <img id="lightboxImg" src="">
@@ -86,25 +94,68 @@ footer{padding:10px 12px 14px;border-top:1px solid #eee;background:#fff}
 </div>
 
 <script>
-let waitingForImageSubject=false,videoMode=false,pendingImageData=null;
+let waitingForImageSubject=false,waitingForMusicSubject=false,videoMode=false,musicMode=false,pendingImageData=null;
+let audioCtx=null, currentOscillators=[], currentMusicId=0;
 const chatEl=document.getElementById('chat'),inp=document.getElementById('inp');
-function setMode(m){videoMode=(m==='video');document.getElementById('modeRasm').classList.toggle('on',!videoMode);document.getElementById('modeVideo').classList.toggle('on',videoMode);}
+function setMode(m){
+  videoMode=(m==='video'); musicMode=(m==='music');
+  document.getElementById('modeRasm').classList.toggle('on',m==='rasm');
+  document.getElementById('modeVideo').classList.toggle('on',m==='video');
+  document.getElementById('modeMusic').classList.toggle('on',m==='music');
+  document.getElementById('modeMusic').classList.toggle('music-on',m==='music');
+  if(m==='music'){ inp.placeholder='Qanaqa musiqa? Masalan: quvnoq...'; askWhatMusic(); }
+  else if(m==='rasm'){ inp.placeholder='Xabar yozing...'; }
+  else if(m==='video'){ inp.placeholder='Video uchun rasm mavzusini yozing...'; }
+}
 function addBubble(text,who,isHtml){const d=document.createElement('div');d.className='bubble '+(who==='me'?'me':'ai');if(isHtml)d.innerHTML=text;else d.textContent=text;chatEl.appendChild(d);chatEl.scrollTop=chatEl.scrollHeight;return d;}
 function saveChat(){try{localStorage.setItem('nonvoy_chat',chatEl.innerHTML);}catch(e){}}
 const saved=localStorage.getItem('nonvoy_chat');
-if(saved)chatEl.innerHTML=saved;else addBubble('Salom! Qanday yordam bera olaman?','ai');
+if(saved)chatEl.innerHTML=saved;else addBubble('Salom! Qanday yordam bera olaman?\n\n🖼️ Rasm — 🎬 Video — 🎵 Musiqa\nPastdan tugmani tanla!','ai');
 const dict={'qizil':'red','qiz':'girl','mashina':'car','gul':'flower',"g'unchak":'rose bud','tog':'mountain','dengiz':'sea','ot':'horse','mushuk':'cat','it':'dog','uy':'house','qush':'bird','olma':'apple','non':'bread'};
 function translateUzToEn(t){let s=' '+t.toLowerCase()+' ';for(const k in dict){s=s.split(k).join(dict[k]);}return s.trim();}
 function isQuestion(t){const s=t.toLowerCase().trim();return s.startsWith('nimani')||s.startsWith('nima')||s.startsWith('qanaqa')||s.startsWith('qanday')||s.startsWith('kim')||s.startsWith('qayer')||s.startsWith('qachon')||s.startsWith('necha')||s.includes("ko'rayapsan")||s.includes("ko'ryapsan")||s.includes('?');}
 function isVagueImageRequest(t){const s=t.toLowerCase().trim();const v=['rasm chizib ber','rasm chiz','rasm yasab ber','rasm yasab','rasm chizib','rasm kerak','rasm','rasm chizib bering','rasm yarat','rasm yaratib ber','chizib ber','rasm chiqarib ber'];if(v.includes(s))return true;if(s.startsWith('rasm chizib ber')&&s.replace('rasm chizib ber','').trim().length<2)return true;return false;}
 function isImageRequest(t){const s=t.toLowerCase();if(s.includes('chiz')||s.includes('yasab ber')||s.includes('yaratib ber')||s.includes('chizib'))return true;if(s.includes('rasmi')&&!isQuestion(t))return true;if(s.includes('rasmini')&&!isQuestion(t))return true;return false;}
+function isVagueMusicRequest(t){const s=t.toLowerCase().trim();return ['musiqa','musiqa yarat','musiqa yaratib ber','musiqa yasab ber','kuy','qo\'shiq','musiqa kerak','musiqa chal','musiqa yaratib'].includes(s)||s==='musiqa yaratib ber';}
+function isMusicRequest(t){const s=t.toLowerCase();return s.includes('musiqa')||s.includes("qo'shiq")||s.includes('kuy')||s.includes('ohang');}
 function askWhatImage(){waitingForImageSubject=true;addBubble(`<div class="label green">💬 Matn</div><div class="ask-box"><b>Qanaqa rasm chizib beray? 🤔</b><br><br>Mavzuni yozing.</div><div class="chips"><button class="chip" onclick="pickSubject('Qizil mashina')">🚗 Qizil mashina</button><button class="chip" onclick="pickSubject('Gul')">🌹 Gul</button><button class="chip" onclick="pickSubject('Tog manzarasi')">🏔️ Tog' manzarasi</button><button class="chip" onclick="pickSubject('Mushuk')">🐱 Mushuk</button></div>`,'ai',true);saveChat();}
 function pickSubject(s){inp.value=s;sendMessage();}
+function askWhatMusic(){
+  if(waitingForMusicSubject) return;
+  waitingForMusicSubject=true;
+  addBubble(`<div class="label green">🎵 Musiqa</div><div class="ask-box"><b>Qanaqa musiqa yaratay? 🎵</b><br><br>Kayfiyatni tanlang — matni ham o'zbekcha badiiy bo'ladi:</div><div class="chips"><button class="chip" onclick="pickMusic('Quvnoq musiqa')">😊 Quvnoq</button><button class="chip" onclick="pickMusic('Soginchli musiqa')">💔 Sog'inchli</button><button class="chip" onclick="pickMusic('Tinchlantiruvchi musiqa')">🌙 Tinchlantiruvchi</button><button class="chip" onclick="pickMusic('To\'y musiqasi')">💃 To'y</button><button class="chip" onclick="pickMusic('Ona haqida musiqa')">❤️ Ona haqida</button><button class="chip" onclick="pickMusic('Vatan haqida musiqa')">🇺🇿 Vatan haqida</button></div>`,'ai',true);
+  saveChat();
+}
+function pickMusic(s){inp.value=s;sendMessage();}
+function getMusicStyle(prompt){
+  const s=prompt.toLowerCase();
+  if(s.includes('quvnoq')||s.includes('toy')||s.includes("to'y")||s.includes('baxt')) return {name:'Quvnoq Navo',tempo:0.28,scale:[0,2,4,5,7,9,11],base:261.63};
+  if(s.includes('sogin')||s.includes('g\'am')||s.includes('huzun')) return {name:'Sog\'inch Noli',tempo:0.55,scale:[0,3,5,7,10],base:220};
+  if(s.includes('tinch')||s.includes('uxla')||s.includes('tinchlantir')) return {name:'Tinch Tun',tempo:0.65,scale:[0,2,4,7,9],base:261.63};
+  if(s.includes('ona')) return {name:'Ona Mehri',tempo:0.5,scale:[0,2,4,7,9],base:261.63};
+  if(s.includes('vatan')||s.includes('yurt')) return {name:'Vatan Madhi',tempo:0.42,scale:[0,2,4,5,7],base:261.63};
+  if(s.includes('bola')) return {name:'Bolajon Erkasi',tempo:0.35,scale:[0,2,4,5,7],base:293.66};
+  return {name:'Ko\'ngil Noli',tempo:0.42,scale:[0,2,4,7,9],base:261.63};
+}
+function makeMelody(style){const notes=[];let seed=Math.floor(Math.random()*1000);const rand=()=>{seed=(seed*9301+49297)%233280;return seed/233280;};for(let i=0;i<24;i++){const deg=style.scale[Math.floor(rand()*style.scale.length)];const oct=Math.floor(rand()*2);const freq=style.base*Math.pow(2,deg/12+oct);notes.push(freq);}return notes;}
+async function generateMusic(prompt){
+  const style=getMusicStyle(prompt);const notes=makeMelody(style);const id=++currentMusicId;
+  const b=addBubble(`<div class="label green">🎵 Musiqa</div><div class="music-box"><h3>🎵 ${style.name}</h3><div>${escapeHtml(prompt)}</div><div class="lyrics">✍️ Badiiy matn yozilyapti...</div><div style="font-size:13px;color:#666;margin-top:6px">O'zbekcha badiiy matn + kuy • Bepul yaratildi</div><button class="mbtn play" onclick="playMusic(${id})">▶️ Chalish</button><button class="mbtn stop" onclick="stopMusic()">⏹ To'xtatish</button><button class="mbtn dl" onclick="downloadMusic(${id})">⬇️ Yuklab olish (WAV)</button></div>`,'ai',true);
+  window['music_'+id]={style,notes};saveChat();setTimeout(()=>playMusic(id),300);
+  try{const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:`"${prompt}" mavzusida o'zbek tilida badiiy qo'shiq matni yoz. Faqat O'ZBEK tilida, chiroyli, qofiyali, badiiy tilda bo'lsin. 2 band, har bandda 4 qator. Naqorat ham bo'lsin: "Naqorat:" deb yoz. Ruscha va inglizcha so'z qo'shma.`})});const d=await r.json();const lyrics=d.reply||'Ko\'nglimda navo yangraydi,\nYuragimda bahor gullaydi.';const el=b.querySelector('.lyrics');if(el)el.textContent='🎤 Qo\'shiq matni:\n\n'+lyrics;saveChat();}catch(e){const el=b.querySelector('.lyrics');if(el)el.textContent='🎤 Qo\'shiq matni:\n\nKo\'nglimda navo yangraydi,\nYuragimda bahor gullaydi,\nO\'zbekistonim — jonim mening,\nSening bilan baxtim to\'ladi.';saveChat();}
+}
+function playMusic(id){stopMusic();const data=window['music_'+id];if(!data)return;if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();audioCtx.resume();const {style,notes}=data;notes.forEach((freq,i)=>{const osc=audioCtx.createOscillator();const gain=audioCtx.createGain();osc.type='sine';osc.frequency.value=freq;gain.gain.setValueAtTime(0.0001,audioCtx.currentTime+i*style.tempo);gain.gain.exponentialRampToValueAtTime(0.25,audioCtx.currentTime+i*style.tempo+0.05);gain.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+i*style.tempo+style.tempo*0.9);osc.connect(gain);gain.connect(audioCtx.destination);osc.start(audioCtx.currentTime+i*style.tempo);osc.stop(audioCtx.currentTime+i*style.tempo+style.tempo);currentOscillators.push(osc);if(i%4===0){const bb=audioCtx.createOscillator();const bg=audioCtx.createGain();bb.type='triangle';bb.frequency.value=freq/2;bg.gain.setValueAtTime(0.0001,audioCtx.currentTime+i*style.tempo);bg.gain.exponentialRampToValueAtTime(0.12,audioCtx.currentTime+i*style.tempo+0.05);bg.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+i*style.tempo+style.tempo*1.8);bb.connect(bg);bg.connect(audioCtx.destination);bb.start(audioCtx.currentTime+i*style.tempo);bb.stop(audioCtx.currentTime+i*style.tempo+style.tempo*2);currentOscillators.push(bb);}});}
+function stopMusic(){currentOscillators.forEach(o=>{try{o.stop();}catch(e){}});currentOscillators=[];}
+function downloadMusic(id){const data=window['music_'+id];if(!data)return;const {style,notes}=data;const sampleRate=44100;const duration=notes.length*style.tempo+1;const buffer=new OfflineAudioContext(1,sampleRate*duration,sampleRate);notes.forEach((freq,i)=>{const osc=buffer.createOscillator();const gain=buffer.createGain();osc.type='sine';osc.frequency.value=freq;gain.gain.setValueAtTime(0.0001,i*style.tempo);gain.gain.exponentialRampToValueAtTime(0.25,i*style.tempo+0.05);gain.gain.exponentialRampToValueAtTime(0.0001,i*style.tempo+style.tempo*0.9);osc.connect(gain);gain.connect(buffer.destination);osc.start(i*style.tempo);osc.stop(i*style.tempo+style.tempo);});buffer.startRendering().then(rendered=>{const wav=encodeWAV(rendered.getChannelData(0),sampleRate);const blob=new Blob([wav],{type:'audio/wav'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='NonvoyAI-musiqa.wav';a.click();});}
+function encodeWAV(samples,sampleRate){const len=samples.length;const buf=new ArrayBuffer(44+len*2);const v=new DataView(buf);const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};w(0,'RIFF');v.setUint32(4,36+len*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sampleRate,true);v.setUint32(28,sampleRate*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,len*2,true);for(let i=0;i<len;i++){let s=Math.max(-1,Math.min(1,samples[i]));v.setInt16(44+i*2,s*32767,true);}return buf;}
 async function sendMessage(){
   const text=inp.value.trim();if(!text&&!pendingImageData)return;
   if(pendingImageData){const imgData=pendingImageData;pendingImageData=null;document.getElementById('previewBox').style.display='none';addBubble('','me',true).innerHTML=(text?escapeHtml(text)+'<br>':'')+'<img src="'+imgData+'">';inp.value='';const b=addBubble('🔍 Rasm tahlili\n\nTahlil qilinyapti...','ai');try{const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text||'Bu rasmda nima bor?',image:imgData})});const d=await r.json();b.innerHTML='<div class="label green">🔍 Rasm tahlili</div>'+escapeHtml(d.reply||d.error||'Xato');}catch(e){b.textContent='Xato: '+e.message;}saveChat();return;}
+  if(waitingForMusicSubject&&text){waitingForMusicSubject=false;addBubble(text,'me');inp.value='';generateMusic(text);return;}
   if(waitingForImageSubject&&text){waitingForImageSubject=false;addBubble(text,'me');inp.value='';generateImage(text);return;}
   addBubble(text,'me');inp.value='';
+  if(isVagueMusicRequest(text)){askWhatMusic();saveChat();return;}
+  if(isMusicRequest(text)){generateMusic(text);return;}
   if(isVagueImageRequest(text)){askWhatImage();saveChat();return;}
   if(isImageRequest(text)){generateImage(text);return;}
   const b=addBubble('Yozilyapti...','ai');try{const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});const d=await r.json();b.innerHTML='<div class="label green">💬 Matn</div>'+escapeHtml(d.reply||d.error||'Xato');}catch(e){b.textContent='Xato: '+e.message;}saveChat();
@@ -115,18 +166,10 @@ document.getElementById('send').onclick=sendMessage;
 inp.addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
 document.getElementById('plus').onclick=()=>document.getElementById('fileInput').click();
 document.getElementById('fileInput').onchange=(e)=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{pendingImageData=rd.result;document.getElementById('previewImg').src=rd.result;document.getElementById('previewBox').style.display='flex';inp.placeholder='Bu rasmda nima bor? deb yozing...';inp.focus();};rd.readAsDataURL(f);e.target.value='';};
-
-// ✅ RASM USTIGA BOSGANDA KATTALASHTIRISH
-chatEl.addEventListener('click', function(e){
-  const img = e.target.closest('img');
-  if(img && img.id !== 'previewImg'){
-    document.getElementById('lightboxImg').src = img.src;
-    document.getElementById('lightbox').classList.add('show');
-  }
-});
-document.getElementById('lightbox').onclick = function(){ this.classList.remove('show'); };
-document.getElementById('lightboxClose').onclick = function(e){ e.stopPropagation(); document.getElementById('lightbox').classList.remove('show'); };
-document.getElementById('previewImg').onclick = function(){ document.getElementById('lightboxImg').src = this.src; document.getElementById('lightbox').classList.add('show'); };
+chatEl.addEventListener('click', function(e){const img=e.target.closest('img');if(img&&img.id!=='previewImg'){document.getElementById('lightboxImg').src=img.src;document.getElementById('lightbox').classList.add('show');}});
+document.getElementById('lightbox').onclick=function(){this.classList.remove('show');};
+document.getElementById('lightboxClose').onclick=function(e){e.stopPropagation();document.getElementById('lightbox').classList.remove('show');};
+document.getElementById('previewImg').onclick=function(){document.getElementById('lightboxImg').src=this.src;document.getElementById('lightbox').classList.add('show');};
 </script>
 </body>
-</html>
+  </html>
