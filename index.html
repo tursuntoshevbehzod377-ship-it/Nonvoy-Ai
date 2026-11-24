@@ -21,7 +21,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:12p
 #dotsMenu{position:fixed;top:60px;right:14px;background:#fff;border-radius:14px;box-shadow:0 4px 20px rgba(0,0,0,0.15);padding:8px;display:none;z-index:99;width:180px}
 #dotsMenu.show{display:block}
 #dotsMenu button{display:block;width:100%;padding:12px;border:none;background:none;text-align:left;font-size:15px}
-main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin:70px auto 0 auto;padding:10px;padding-bottom:140px}
+main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin:70px auto 0 auto;padding:10px;padding-bottom:150px}
 .logo-wrap{text-align:center;margin:70px 0 20px 0}
 .logo-img{width:160px;height:160px;object-fit:cover;border-radius:50%;border:4px solid #f5c542;box-shadow:0 10px 25px rgba(0,0,0,0.18)}
 .logo-text{font-size:24px;font-weight:bold;margin-top:12px}
@@ -38,8 +38,10 @@ main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin
 .input-row{display:flex;align-items:center;gap:8px}
 #msg{flex:1;border:none;outline:none;font-size:17px;padding:10px;background:transparent}
 .plus-btn{width:42px;height:42px;min-width:42px;border-radius:50%;border:1px solid #ddd;background:#fff;font-size:24px;display:flex;align-items:center;justify-content:center}
-.instant-btn{border:1px solid #ddd;background:#fff;border-radius:999px;padding:8px 16px}
+.mode-btn{border:1px solid #ddd;background:#fff;border-radius:999px;padding:8px 14px;font-size:14px}
+.mode-btn.active{background:#111;color:#fff;border-color:#111}
 .send-btn{width:48px;height:48px;min-width:48px;border-radius:50%;border:none;background:#111;color:#fff;font-size:22px;cursor:pointer}
+.hint{font-size:12px;color:#888;text-align:center;margin-top:4px}
 </style>
 </head>
 <body>
@@ -80,13 +82,15 @@ main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin
 <div class="input-row">
 <input id="msg" placeholder="Ask Nonvoy AI..." autocomplete="off">
 </div>
-<div class="input-row" style="justify-content:space-between;margin-top:6px">
+<div class="input-row" style="justify-content:space-between;margin-top:8px">
 <button type="button" class="plus-btn" onclick="alert('Rasm yuklash tez orada')">+</button>
-<div style="display:flex;gap:8px;align-items:center">
-<button type="button" class="instant-btn">Instant</button>
+<div style="display:flex;gap:6px;align-items:center">
+<button type="button" id="imgBtn" class="mode-btn">🖼️ Rasm</button>
+<button type="button" id="vidBtn" class="mode-btn">🎬 Video</button>
 <button type="button" id="sendBtn" class="send-btn">↑</button>
 </div>
 </div>
+<div class="hint" id="hint">Matn rejimi — faqat yozib javob beradi</div>
 </div>
 <div style="text-align:center;color:#aaa;font-size:12px;margin-top:6px">Nonvoy AI © 2026</div>
 </div>
@@ -94,12 +98,35 @@ main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin
 var chat=document.getElementById("chat");
 var input=document.getElementById("msg");
 var sendBtn=document.getElementById("sendBtn");
+var imgBtn=document.getElementById("imgBtn");
+var vidBtn=document.getElementById("vidBtn");
+var hint=document.getElementById("hint");
 var history=[];
-var isSending=false;
+var wantImage=false;
+var wantVideo=false;
 function openSidebar(){ document.getElementById("sidebar").classList.add("open"); document.getElementById("overlay").classList.add("show"); }
 function toggleDots(){ document.getElementById("dotsMenu").classList.toggle("show"); }
 function closeAll(){ document.getElementById("sidebar").classList.remove("open"); document.getElementById("overlay").classList.remove("show"); document.getElementById("dotsMenu").classList.remove("show"); }
 function newChat(){ chat.innerHTML=""; document.getElementById("logoWrap").style.display="block"; history=[]; closeAll(); }
+function updateHint(){
+  if(wantImage && wantVideo) hint.textContent="Rasm + Video rejimi — rasm va video ham chiqadi";
+  else if(wantImage) hint.textContent="Rasm rejimi — rasm ham chiqadi";
+  else if(wantVideo) hint.textContent="Video rejimi — video ham chiqadi";
+  else hint.textContent="Matn rejimi — faqat yozib javob beradi";
+}
+imgBtn.addEventListener("click",function(){
+  wantImage=!wantImage;
+  imgBtn.classList.toggle("active",wantImage);
+  updateHint();
+  input.focus();
+});
+vidBtn.addEventListener("click",function(){
+  wantVideo=!wantVideo;
+  vidBtn.classList.toggle("active",wantVideo);
+  if(wantVideo) { wantImage=true; imgBtn.classList.add("active"); }
+  updateHint();
+  input.focus();
+});
 function addMessage(text,type){
   document.getElementById("logoWrap").style.display="none";
   var div=document.createElement("div");
@@ -115,28 +142,29 @@ function cleanReply(t){
 }
 function localReply(msg){
   var t=msg.toLowerCase().trim();
-  if(t.indexOf("salom")===0 || t.indexOf("assalom")===0) return "Salom! Qandaysiz? Men Nonvoy AI man. Nima yordam beray? Rasm chizishimni xohlaysizmi yoki savolingiz bormi?";
-  if(t.indexOf("qalesan")>=0 || t.indexOf("qandaysan")>=0) return "Yaxshi, rahmat! Siz qandaysiz? Nima yordam beray?";
+  if(t.indexOf("salom")===0 || t.indexOf("assalom")===0) return "Salom! Qandaysiz? Men Nonvoy AI man. Rasm kerak bo'lsa pastdagi Rasm tugmasini bosing.";
+  if(t.indexOf("qalesan")>=0 || t.indexOf("qandaysan")>=0) return "Yaxshi, rahmat! Siz qandaysiz?";
   if(t.indexOf("rahmat")>=0) return "Arzimaydi! Yana savolingiz bo'lsa yozing.";
   if(t.indexOf("kim")>=0 && t.indexOf("sen")>=0) return "Men Nonvoy AI man — Vodiy nonidek issiq yordamchi. Matn yozaman, rasm chizaman, video qilaman.";
   return "";
 }
 function shouldMakeImage(msg){
+  if(wantImage || wantVideo) return true;
   var t=msg.toLowerCase().trim();
   if(t.indexOf("rasm")>=0 || t.indexOf("surat")>=0 || t.indexOf("foto")>=0 || t.indexOf("tasvir")>=0 || t.indexOf("chiz")>=0 || t.indexOf("yarat")>=0 || t.indexOf("video")>=0) return true;
-  if(t.indexOf("gul")>=0 || t.indexOf("gunchak")>=0 || t.indexOf("non")>=0 || t.indexOf("mushuk")>=0 || t.indexOf("mashina")>=0 || t.indexOf("daraxt")>=0 || t.indexOf("qush")>=0) return true;
   if(t.indexOf("salom")===0 || t.indexOf("assalom")===0 || t.indexOf("rahmat")===0) return false;
   if(t.indexOf("?")>=0) return false;
   return false;
 }
 function translate(prompt){
   var e=prompt;
+  e=e.replace(/rasm/gi,"").replace(/chiz/gi,"").replace(/yarat/gi,"").replace(/tasvir/gi,"").replace(/surat/gi,"");
   var dict={qizil:"red",mashina:"car",mushuk:"cat",it:"dog",uy:"house",gul:"flower",tog:"mountain",dengiz:"sea",qiz:"girl",bola:"boy",shahar:"city",osmon:"sky",quyosh:"sun",oy:"moon",daraxt:"tree",at:"horse",qush:"bird",olma:"apple",kitob:"book",telefon:"phone",robot:"robot",samolyot:"airplane",poezd:"train",kema:"ship",qor:"snow",non:"uzbek bread"};
   Object.keys(dict).forEach(function(k){ e=e.split(k).join(dict[k]); });
-  return "extremely sharp, crystal clear, high resolution, highly detailed, cinematic lighting, ultra realistic, 8k, professional photography, "+e+", sharp focus, detailed texture, vibrant colors";
+  return "beautiful, highly detailed, cinematic lighting, ultra realistic, professional photography, "+e.trim();
 }
 function makeImageUrl(prompt){
-  return "https://image.pollinations.ai/prompt/"+encodeURIComponent(translate(prompt))+"?width=1536&height=1536&seed="+Math.floor(Math.random()*999999)+"&nologo=true&model=flux&enhance=true";
+  return "https://image.pollinations.ai/prompt/"+encodeURIComponent(translate(prompt))+"?width=1024&height=1024&seed="+Math.floor(Math.random()*999999)+"&nologo=true&model=flux";
 }
 function makeVideoFromImage(imgUrl,box){
   var img=new Image();
@@ -179,7 +207,7 @@ function makeVideoFromImage(imgUrl,box){
     requestAnimationFrame(draw);
   };
 }
-function showImageVideo(message,box){
+function showImageVideo(message,box,doVideo){
   var h2=document.createElement("h3"); h2.textContent="🖼️ Rasm"; box.appendChild(h2);
   var imgUrl=makeImageUrl(message);
   var img=document.createElement("img");
@@ -189,42 +217,47 @@ function showImageVideo(message,box){
     loading.remove();
     box.appendChild(img);
     var dl=document.createElement("a"); dl.href=imgUrl; dl.download="nonvoy.png"; dl.textContent="Rasmni yuklab olish"; box.appendChild(dl);
-    var h3=document.createElement("h3"); h3.textContent="🎬 Video"; box.appendChild(h3);
-    var vload=document.createElement("div"); vload.textContent="Video tayyorlanmoqda..."; box.appendChild(vload);
-    setTimeout(function(){ vload.remove(); makeVideoFromImage(imgUrl,box); },500);
+    if(doVideo){
+      var h3=document.createElement("h3"); h3.textContent="🎬 Video"; box.appendChild(h3);
+      var vload=document.createElement("div"); vload.textContent="Video tayyorlanmoqda..."; box.appendChild(vload);
+      setTimeout(function(){ vload.remove(); makeVideoFromImage(imgUrl,box); },500);
+    }
   };
-  img.onerror=function(){ loading.textContent="Rasm chiqmadi, 45 soniya kutib qayta urinib koring."; };
+  img.onerror=function(){ loading.textContent="Rasm chiqmadi. 45 soniya kutib, Rasm tugmasi yoqilganini tekshirib qayta urinib koring."; };
 }
 async function send(){
-  if(isSending) return;
   var message=input.value.trim();
   if(!message) return;
-  isSending=true;
+  var doImage=shouldMakeImage(message);
+  var doVideo=wantVideo;
   input.value="";
   addMessage(message,"user");
   var box=addMessage("","ai");
   box.textContent="Tayyorlanmoqda...";
   var reply="";
   try{
+    var controller=new AbortController();
+    var timer=setTimeout(function(){ controller.abort(); }, 15000);
     var response=await fetch("/api/chat",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({message:message,history:history})
+      body:JSON.stringify({message:message,history:history}),
+      signal: controller.signal
     });
+    clearTimeout(timer);
     var data=await response.json();
     reply=cleanReply(data.reply || "");
   }catch(e){ reply=""; }
   if(!reply || reply.indexOf("server band")>=0){
     var local=localReply(message);
     if(local) reply=local;
-    else if(!reply) reply="Hozir server band, lekin men shu yerdaman. Birozdan keyin qayta urinib koring.";
+    else if(!reply) reply="Tushundim. Rasm kerak bo'lsa pastdagi Rasm tugmasini yoqib yozing.";
   }
   box.textContent="";
   var h1=document.createElement("h3"); h1.textContent="💬 Matn"; box.appendChild(h1);
   var p=document.createElement("div"); p.textContent=reply; box.appendChild(p);
   history.push({role:"user",content:message},{role:"assistant",content:reply});
-  if(shouldMakeImage(message)) showImageVideo(message,box);
-  isSending=false;
+  if(doImage) showImageVideo(message,box,doVideo);
   input.focus();
 }
 sendBtn.addEventListener("click",send);
