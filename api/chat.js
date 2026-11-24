@@ -1,145 +1,52 @@
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-
-  if (req.method !== "POST") {
-    return res.status(405).json({
-      reply: "Faqat POST so'rovi mumkin."
-    });
-  }
-
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.status(200).end();
   try {
-    const { message, messages, image, mode } = req.body || {};
-    const apiKey = process.env.GEMINI_API_KEY;
+    const { message, image, mode } = req.body || {};
+    const text = (message || '').toString().trim();
+    const lower = text.toLowerCase();
+    const GROQ = process.env.GROQ_API_KEY;
+    const GEMINI = process.env.GEMINI_API_KEY;
 
-    if (!apiKey) {
-      return res.status(500).json({
-        reply: "GEMINI_API_KEY kaliti topilmadi."
-      });
-    }
-
-    const text =
-      message ||
-      (Array.isArray(messages)
-        ? messages[messages.length - 1]?.content
-        : "") ||
-      "";
-
-    // RASM YARATISH
-    const wantImage =
-      mode === "image" ||
-      /rasm yarat|rasm chiz|rasm yas|surat yarat/i.test(text);
-
-    if (wantImage && !image) {
-      const prompt = encodeURIComponent(
-        text +
-        ", photorealistic, highly detailed, sharp focus, professional photography, beautiful lighting"
-      );
-
-      const imageUrl =
-        "https://image.pollinations.ai/prompt/" +
-        prompt +
-        "?width=1024&height=1024&nologo=true&model=flux";
-
-      return res.status(200).json({
-        reply: "Rasm tayyor:\n" + imageUrl,
-        imageUrl
-      });
-    }
-
-    // GEMINI UCHUN MA'LUMOT
-    const parts = [];
-
+    // 1. RASM KELSA - FAQAT TAHLIL
     if (image) {
-      let base64 = image;
-      let mimeType = "image/jpeg";
-
-      if (image.startsWith("data:")) {
-        const match = image.match(
-          /^data:(.*?);base64,(.*)$/
-        );
-
-        if (match) {
-          mimeType = match[1];
-          base64 = match[2];
-        }
-      }
-
-      parts.push({
-        inlineData: {
-          mimeType: mimeType,
-          data: base64
-        }
+      const b64 = image.includes(',') ? image.split(',')[1] : image;
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: `O'zbek tilida javob ber. Rasm chizma. Faqat rasmda nima borligini ayt. Savol: ${text}` }, { inline_data: { mime_type: 'image/jpeg', data: b64 } }] }] })
       });
-
-      parts.push({
-        text:
-          "Bu rasmni diqqat bilan tahlil qil. " +
-          "Undagi narsalarni aniq tasvirla. " +
-          "Bilmagan narsangni o'ylab topma. " +
-          "O'zbek tilida javob ber. Savol: " + text
-      });
-    } else {
-      parts.push({
-        text:
-          "Sen Nonvoy AI yordamchisisan. " +
-          "O'zbek tilida aniq, aqlli va tushunarli javob ber.\n\n" +
-          text
-      });
+      const d = await r.json();
+      const ans = d?.candidates?.[0]?.content?.parts?.map(p => p.text).join('');
+      return res.status(200).json({ reply: ans || ('Gemini xatosi: ' + (d?.error?.message || 'kalitni tekshir')) });
     }
 
-    // GEMINI 3.8 FLASH
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=" +
-      encodeURIComponent(apiKey),
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: parts
-            }
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 2048
-          }
-        })
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return res.status(response.status).json({
-        reply:
-          "Gemini xatosi: " +
-          (data.error?.message || "So'rov bajarilmadi.")
-      });
+    // 2. RASM CHIZISH
+    if (mode === 'image' || /rasm chiz|chizib ber|rasm yarat/i.test(lower)) {
+      const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(text + ', beautiful, cinematic, sharp')}?width=1024&height=1024&seed=${Date.now()}&nologo=true`;
+      return res.status(200).json({ reply: 'Mana rasming:', imageUrl: url });
     }
 
-    const reply =
-      data.candidates?.[0]?.content?.parts
-        ?.map(part => part.text || "")
-        .join("") ||
-      "Javob olinmadi.";
+    // 3. MATN - AVVAL GROQ
+    if (GROQ) {
+      const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST', headers: { 'Authorization': `Bearer ${GROQ}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'llama-3.1-8b-instant', messages: [{ role: 'system', content: `Sen Nonvoy AI san. O'zbek tilida javob ber.` }, { role: 'user', content: text }] })
+      });
+      const d = await r.json();
+      if (d?.choices?.[0]?.message?.content) return res.status(200).json({ reply: d.choices[0].message.content });
+    }
 
-    return res.status(200).json({
-      reply: reply
+    // 4. MATN - KEYIN GEMINI
+    const r2 = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: text }] }] })
     });
-
-  } catch (error) {
-    return res.status(500).json({
-      reply: "Xatolik: " + error.message
-    });
+    const d2 = await r2.json();
+    const ans2 = d2?.candidates?.[0]?.content?.parts?.map(p => p.text).join('');
+    return res.status(200).json({ reply: ans2 || ('Gemini xatosi: ' + (d2?.error?.message || 'kalitni tekshir')) });
+  } catch (e) {
+    return res.status(200).json({ reply: 'Xato: ' + e.message });
   }
-}
+  }
