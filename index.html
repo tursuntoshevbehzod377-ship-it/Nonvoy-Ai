@@ -53,11 +53,11 @@ main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin
 </div><div style="text-align:center;color:#aaa;font-size:12px;margin-top:6px">Nonvoy AI © 2026</div></div>
 <script>
 var chat=document.getElementById("chat"),input=document.getElementById("msg"),sendBtn=document.getElementById("sendBtn"),imgBtn=document.getElementById("imgBtn"),vidBtn=document.getElementById("vidBtn"),hint=document.getElementById("hint");
-var history=[],wantImage=false,wantVideo=false,selectedImage=null;
+var chatHistory=[],wantImage=false,wantVideo=false,selectedImage=null;
 function openSidebar(){document.getElementById("sidebar").classList.add("open");document.getElementById("overlay").classList.add("show");}
 function toggleDots(){document.getElementById("dotsMenu").classList.toggle("show");}
 function closeAll(){document.getElementById("sidebar").classList.remove("open");document.getElementById("overlay").classList.remove("show");document.getElementById("dotsMenu").classList.remove("show");}
-function newChat(){chat.innerHTML="";document.getElementById("logoWrap").style.display="block";history=[];selectedImage=null;document.getElementById("previewBox").style.display="none";closeAll();}
+function newChat(){chat.innerHTML="";document.getElementById("logoWrap").style.display="block";chatHistory=[];selectedImage=null;document.getElementById("previewBox").style.display="none";closeAll();}
 function updateHint(){if(selectedImage)hint.textContent="Rasm tanlandi — savol yozib yuboring";else if(wantImage)hint.textContent="Rasm rejimi";else hint.textContent="+ ni bosib rasm yuboring — tahlil qilib beradi";}
 imgBtn.onclick=function(){wantImage=!wantImage;imgBtn.classList.toggle("active",wantImage);updateHint();};
 vidBtn.onclick=function(){wantVideo=!wantVideo;vidBtn.classList.toggle("active",wantVideo);if(wantVideo){wantImage=true;imgBtn.classList.add("active");}updateHint();};
@@ -66,7 +66,6 @@ document.getElementById("fileInput").onchange=function(e){
   var f=e.target.files[0]; if(!f) return;
   var reader=new FileReader();
   reader.onload=function(ev){
-    // RASIMNI KICHIKLASHTIRAMIZ - eng muhim joy
     var img=new Image();
     img.onload=function(){
       var canvas=document.createElement("canvas");
@@ -106,12 +105,12 @@ async function send(){
     var imgToSend=selectedImage;selectedImage=null;document.getElementById("previewBox").style.display="none";document.getElementById("fileInput").value="";input.value="";updateHint();
     var box=addMessage("","ai");box.textContent="Rasmni ko'ryapman...";
     try{
-      var resp=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:q,history:history,image:imgToSend})});
+      var resp=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:q,history:chatHistory,image:imgToSend})});
       var d=await resp.json();
       box.textContent="";
       var h=document.createElement("h3");h.textContent="🔍 Rasm tahlili";box.appendChild(h);
       var p=document.createElement("div");p.textContent=cleanReply(d.reply||"Javob kelmadi");box.appendChild(p);
-      history.push({role:"user",content:q},{role:"assistant",content:d.reply||""});
+      chatHistory.push({role:"user",content:q},{role:"assistant",content:d.reply||""});
     }catch(e){ box.textContent="XATO: Serverga ulanmadim. Sabab: "+e.message; }
     input.focus(); return;
   }
@@ -120,10 +119,10 @@ async function send(){
   var box2=addMessage("","ai");box2.textContent="Tayyorlanmoqda...";
   if(doImage){box2.textContent="";var h0=document.createElement("h3");h0.textContent="💬 Matn";box2.appendChild(h0);var p0=document.createElement("div");p0.textContent="Mana, rasmingizni tayyorladim!";box2.appendChild(p0);showImageVideo(message,box2,doVideo);input.focus();return;}
   try{
-    var r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:message,history:history})});
+    var r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:message,history:chatHistory})});
     var data=await r.json();var reply=cleanReply(data.reply||"Javob kelmadi");
     box2.textContent="";var h1=document.createElement("h3");h1.textContent="💬 Matn";box2.appendChild(h1);var pp=document.createElement("div");pp.textContent=reply;box2.appendChild(pp);
-    history.push({role:"user",content:message},{role:"assistant",content:reply});
+    chatHistory.push({role:"user",content:message},{role:"assistant",content:reply});
   }catch(e){ box2.textContent="XATO: "+e.message; }
   input.focus();
 }
