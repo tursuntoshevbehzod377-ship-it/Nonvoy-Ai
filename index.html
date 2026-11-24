@@ -39,32 +39,33 @@ main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin
 #msg{flex:1;border:none;outline:none;font-size:17px;padding:10px;background:transparent}
 .plus-btn{width:42px;height:42px;min-width:42px;border-radius:50%;border:1px solid #ddd;background:#fff;font-size:24px;display:flex;align-items:center;justify-content:center}
 .instant-btn{border:1px solid #ddd;background:#fff;border-radius:999px;padding:8px 16px}
-.send-btn{width:44px;height:44px;min-width:44px;border-radius:50%;border:none;background:#111;color:#fff;font-size:20px}
+.send-btn{width:48px;height:48px;min-width:48px;border-radius:50%;border:none;background:#111;color:#fff;font-size:22px;cursor:pointer;z-index:10}
+.send-btn:active{transform:scale(0.95)}
 </style>
 </head>
 <body>
 <div id="overlay" onclick="closeAll()"></div>
 <div id="sidebar">
 <h3>Nonvoy AI</h3>
-<button onclick="newChat()">✨ Yangi suhbat</button>
-<button onclick="closeAll()">💬 Suhbatlar</button>
-<button onclick="closeAll()">🖼️ Rasmlarim</button>
-<button onclick="closeAll()">🎬 Videolarim</button>
-<button onclick="closeAll()">⚙️ Sozlamalar</button>
+<button type="button" onclick="newChat()">✨ Yangi suhbat</button>
+<button type="button" onclick="closeAll()">💬 Suhbatlar</button>
+<button type="button" onclick="closeAll()">🖼️ Rasmlarim</button>
+<button type="button" onclick="closeAll()">🎬 Videolarim</button>
+<button type="button" onclick="closeAll()">⚙️ Sozlamalar</button>
 </div>
 <div id="dotsMenu">
-<button onclick="newChat()">✨ Yangi suhbat</button>
-<button onclick="alert('Ulashish tez orada')">🔗 Ulashish</button>
-<button onclick="alert('Nonvoy AI v2.0')">ℹ️ Sayt haqida</button>
+<button type="button" onclick="newChat()">✨ Yangi suhbat</button>
+<button type="button" onclick="alert('Ulashish tez orada')">🔗 Ulashish</button>
+<button type="button" onclick="alert('Nonvoy AI v2.0')">ℹ️ Sayt haqida</button>
 </div>
 <header>
 <div class="header-left">
-<button class="menu-btn" onclick="openSidebar()">☰</button>
+<button type="button" class="menu-btn" onclick="openSidebar()">☰</button>
 <span class="header-title">Nonvoy AI</span>
 </div>
 <div style="display:flex;gap:8px;align-items:center">
-<button class="glasses-btn" onclick="alert('Glasses tez orada')">👓 Glasses</button>
-<button class="menu-btn" onclick="toggleDots()">⋮</button>
+<button type="button" class="glasses-btn" onclick="alert('Glasses tez orada')">👓 Glasses</button>
+<button type="button" class="menu-btn" onclick="toggleDots()">⋮</button>
 </div>
 </header>
 <main>
@@ -78,30 +79,31 @@ main{flex:1;display:flex;flex-direction:column;max-width:700px;width:100%;margin
 <div class="bottom-bar">
 <div class="input-box">
 <div class="input-row">
-<input id="msg" placeholder="Ask Nonvoy AI...">
+<input id="msg" placeholder="Ask Nonvoy AI..." autocomplete="off">
 </div>
 <div class="input-row" style="justify-content:space-between;margin-top:6px">
-<button class="plus-btn" onclick="alert('Rasm yuklash tez orada')">+</button>
+<button type="button" class="plus-btn" onclick="alert('Rasm yuklash tez orada')">+</button>
 <div style="display:flex;gap:8px;align-items:center">
-<button class="instant-btn">Instant</button>
-<button class="send-btn" onclick="send()">↑</button>
+<button type="button" class="instant-btn">Instant</button>
+<button type="button" id="sendBtn" class="send-btn">↑</button>
 </div>
 </div>
 </div>
 <div style="text-align:center;color:#aaa;font-size:12px;margin-top:6px">Nonvoy AI © 2026</div>
 </div>
 <script>
-const chat=document.getElementById("chat");
-const input=document.getElementById("msg");
-const button=document.querySelector(".send-btn");
-let history=[];
+var chat=document.getElementById("chat");
+var input=document.getElementById("msg");
+var sendBtn=document.getElementById("sendBtn");
+var history=[];
+var isSending=false;
 function openSidebar(){ document.getElementById("sidebar").classList.add("open"); document.getElementById("overlay").classList.add("show"); }
 function toggleDots(){ document.getElementById("dotsMenu").classList.toggle("show"); }
 function closeAll(){ document.getElementById("sidebar").classList.remove("open"); document.getElementById("overlay").classList.remove("show"); document.getElementById("dotsMenu").classList.remove("show"); }
 function newChat(){ chat.innerHTML=""; document.getElementById("logoWrap").style.display="block"; history=[]; closeAll(); }
 function addMessage(text,type){
   document.getElementById("logoWrap").style.display="none";
-  const div=document.createElement("div");
+  var div=document.createElement("div");
   div.className="message "+type;
   div.textContent=text;
   chat.appendChild(div);
@@ -114,68 +116,60 @@ function cleanReply(t){
   t=t.replace(/\*\*/g,"");
   t=t.replace(/!\[.*?\]\(.*?\)/g,"");
   t=t.replace(/\[.*?\]\(.*?\)/g,"");
-  t=t.replace(/[.\-_\/\\|Y]{10,}/g,"");
   return t.trim();
 }
 function shouldMakeImage(msg){
-  const t=msg.toLowerCase().trim();
-  if(/(rasm|surat|foto|tasvir|chiz|yarat|ko'rsat|korsat|video|animatsiya|image|picture|draw|generate|chizib|yaratib|ko'rsatib)/.test(t)) return true;
-  if(/(gul|g'unchak|gunchak|atirgul|lola|non|mushuk|it|kuchuk|mashina|uy|tog'|dengiz|qiz|bola|shahar|osmon|quyosh|oy|daraxt|at|qush|olma|kitob|telefon|robot|samolyot|poezd|kema|yomg'ir|qor|bog'|o'rmon|ko'l|tabiat|hayvon|qishloq|bozor)/.test(t)) return true;
-  if(/^(salom|assalom|salomlar|hi|hello|hey|hayr|xayr|qalesan|qandaysan|yaxshimisan|yaxshi|rahmat|tushunarli|ha|yo'q|ok|okey)/.test(t)) return false;
-  if(t.includes("?") || /(^|\s)(nima|qanday|nega|nima uchun|kim|qachon|qayerda|qayerga|qayerdan|nechta|necha|qaysi|qanaqa|tushuntir|ayt|yoz|hisobla|tarjima|yordam|maslahat|nima qilish|qanday qilish|bo'ladimi|mumkinmi|kerakmi)/.test(t)) return false;
-  if(t.split(" ").length<=2) return false;
+  var t=msg.toLowerCase().trim();
+  if(t.indexOf("rasm")>=0 || t.indexOf("surat")>=0 || t.indexOf("foto")>=0 || t.indexOf("tasvir")>=0 || t.indexOf("chiz")>=0 || t.indexOf("yarat")>=0 || t.indexOf("video")>=0 || t.indexOf("animatsiya")>=0) return true;
+  if(t.indexOf("gul")>=0 || t.indexOf("gunchak")>=0 || t.indexOf("non")>=0 || t.indexOf("mushuk")>=0 || t.indexOf("mashina")>=0 || t.indexOf("uy")>=0 || t.indexOf("tog")>=0 || t.indexOf("dengiz")>=0 || t.indexOf("daraxt")>=0 || t.indexOf("qush")>=0) return true;
+  if(t.indexOf("salom")===0 || t.indexOf("assalom")===0 || t.indexOf("hi")===0 || t.indexOf("hello")===0 || t.indexOf("rahmat")===0) return false;
+  if(t.indexOf("?")>=0) return false;
+  if(t.indexOf("nima")>=0 || t.indexOf("qanday")>=0 || t.indexOf("nega")>=0 || t.indexOf("kim")>=0 || t.indexOf("qachon")>=0 || t.indexOf("qayerda")>=0 || t.indexOf("tushuntir")>=0 || t.indexOf("tarjima")>=0) return false;
   return false;
 }
 function translate(prompt){
-  let e=prompt;
-  const dict={qizil:"red",mashina:"car",mushuk:"cat",it:"dog",uy:"house",gul:"flower",gunchak:"rosebud",tog:"mountain",dengiz:"sea",qiz:"girl",bola:"boy",shahar:"city",osmon:"sky",quyosh:"sun",oy:"moon",daraxt:"tree",at:"horse",qush:"bird",olma:"apple",kitob:"book",telefon:"phone",kompyuter:"computer",robot:"robot",samolyot:"airplane",poezd:"train",kema:"ship",yomgir:"rain",qor:"snow",non:"uzbek bread"};
-  Object.keys(dict).forEach(k=>{ e=e.replace(new RegExp(k,"gi"),dict[k]); });
-  e=e.replace(/g'unchak/gi,"rosebud").replace(/g’unchak/gi,"rosebud");
+  var e=prompt;
+  var dict={qizil:"red",mashina:"car",mushuk:"cat",it:"dog",uy:"house",gul:"flower",tog:"mountain",dengiz:"sea",qiz:"girl",bola:"boy",shahar:"city",osmon:"sky",quyosh:"sun",oy:"moon",daraxt:"tree",at:"horse",qush:"bird",olma:"apple",kitob:"book",telefon:"phone",robot:"robot",samolyot:"airplane",poezd:"train",kema:"ship",qor:"snow",non:"uzbek bread"};
+  Object.keys(dict).forEach(function(k){ e=e.split(k).join(dict[k]); });
   return "extremely sharp, crystal clear, high resolution, highly detailed, cinematic lighting, ultra realistic, 8k, professional photography, "+e+", sharp focus, detailed texture, vibrant colors";
 }
 function makeImageUrl(prompt){
   return "https://image.pollinations.ai/prompt/"+encodeURIComponent(translate(prompt))+"?width=1536&height=1536&seed="+Math.floor(Math.random()*999999)+"&nologo=true&model=flux&enhance=true";
 }
 function makeVideoFromImage(imgUrl,box){
-  const img=new Image();
+  var img=new Image();
   img.crossOrigin="anonymous";
   img.src=imgUrl;
-  img.onload=()=>{
-    const canvas=document.createElement("canvas");
+  img.onload=function(){
+    var canvas=document.createElement("canvas");
     canvas.width=640; canvas.height=640;
     box.appendChild(canvas);
-    const ctx=canvas.getContext("2d");
-    const stream=canvas.captureStream(30);
-    const chunks=[];
-    let mime="video/webm";
+    var ctx=canvas.getContext("2d");
+    var stream=canvas.captureStream(30);
+    var chunks=[];
+    var mime="video/webm";
     if(MediaRecorder.isTypeSupported("video/webm;codecs=vp9")) mime="video/webm;codecs=vp9";
-    const rec=new MediaRecorder(stream,{mimeType:mime});
-    rec.ondataavailable=e=>{ if(e.data.size>0) chunks.push(e.data); };
-    rec.onstop=()=>{
-      const blob=new Blob(chunks,{type:"video/webm"});
-      const url=URL.createObjectURL(blob);
-      const v=document.createElement("video");
+    var rec=new MediaRecorder(stream,{mimeType:mime});
+    rec.ondataavailable=function(e){ if(e.data.size>0) chunks.push(e.data); };
+    rec.onstop=function(){
+      var blob=new Blob(chunks,{type:"video/webm"});
+      var url=URL.createObjectURL(blob);
+      var v=document.createElement("video");
       v.src=url; v.controls=true; v.loop=true; v.autoplay=true; v.playsInline=true; v.muted=true;
-      v.addEventListener("loadedmetadata",()=>{
-        if(v.duration===Infinity){
-          v.currentTime=1e7;
-          v.ontimeupdate=()=>{ v.currentTime=0; v.ontimeupdate=null; };
-        }
-      });
       box.appendChild(v);
-      const dl=document.createElement("a");
+      var dl=document.createElement("a");
       dl.href=url; dl.download="nonvoy-video.webm"; dl.textContent="Videoni yuklab olish";
       box.appendChild(dl);
     };
-    let start=performance.now();
+    var start=performance.now();
     rec.start(250);
     function draw(now){
-      const t=(now-start)/5000;
+      var t=(now-start)/5000;
       if(t>=1){ rec.stop(); return; }
-      const zoom=1+t*0.35;
-      const w=640*zoom, h=640*zoom;
-      const x=(640-w)/2 + Math.sin(t*3)*20;
-      const y=(640-h)/2;
+      var zoom=1+t*0.35;
+      var w=640*zoom, h=640*zoom;
+      var x=(640-w)/2 + Math.sin(t*3)*20;
+      var y=(640-h)/2;
       ctx.fillStyle="#000"; ctx.fillRect(0,0,640,640);
       ctx.drawImage(img,x,y,w,h);
       requestAnimationFrame(draw);
@@ -184,28 +178,51 @@ function makeVideoFromImage(imgUrl,box){
   };
 }
 async function send(){
-  const message=input.value.trim();
+  if(isSending) return;
+  var message=input.value.trim();
   if(!message) return;
+  isSending=true;
   input.value="";
-  button.disabled=true;
   addMessage(message,"user");
-  const box=addMessage("","ai");
+  var box=addMessage("","ai");
   box.textContent="Tayyorlanmoqda...";
   try{
-    const response=await fetch("/api/chat",{
+    var response=await fetch("/api/chat",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({message:message+" [Javobda ASCII rasm, kod blok, ``` ishlatma. Faqat oddiy o'zbekcha matn bilan javob ber.]",history:history})
+      body:JSON.stringify({message:message+" [Javobda ASCII rasm, kod blok ishlatma. Faqat oddiy ozbekcha matn bilan javob ber.]",history:history})
     });
-    const data=await response.json();
-    let reply=cleanReply(data.reply || "");
+    var data=await response.json();
+    var reply=cleanReply(data.reply || "");
     if(!reply) reply="Mana, pastda rasmini tayyorladim.";
     box.textContent="";
-    const h1=document.createElement("h3"); h1.textContent="💬 Matn"; box.appendChild(h1);
-    const p=document.createElement("div"); p.textContent=reply; box.appendChild(p);
+    var h1=document.createElement("h3"); h1.textContent="💬 Matn"; box.appendChild(h1);
+    var p=document.createElement("div"); p.textContent=reply; box.appendChild(p);
     history.push({role:"user",content:message},{role:"assistant",content:reply});
     if(shouldMakeImage(message)){
-      const h2=document.createElement("h3"); h2.textContent="🖼️ Rasm"; box.appendChild(h2);
-      const imgUrl=makeImageUrl(message);
-      const img=document.createElement("img");
-      img.src=img
+      var h2=document.createElement("h3"); h2.textContent="🖼️ Rasm"; box.appendChild(h2);
+      var imgUrl=makeImageUrl(message);
+      var img=document.createElement("img");
+      img.src=imgUrl;
+      var loading=document.createElement("div"); loading.textContent="Rasm tayyorlanmoqda..."; box.appendChild(loading);
+      img.onload=function(){
+        loading.remove();
+        box.appendChild(img);
+        var dl=document.createElement("a"); dl.href=imgUrl; dl.download="nonvoy.png"; dl.textContent="Rasmni yuklab olish"; box.appendChild(dl);
+        var h3=document.createElement("h3"); h3.textContent="🎬 Video"; box.appendChild(h3);
+        var vload=document.createElement("div"); vload.textContent="Video tayyorlanmoqda..."; box.appendChild(vload);
+        setTimeout(function(){ vload.remove(); makeVideoFromImage(imgUrl,box); },500);
+      };
+      img.onerror=function(){ loading.textContent="Rasm chiqmadi, 45 soniya kutib qayta urinib koring."; };
+    }
+  }catch(e){
+    box.textContent="Xatolik: Internetni tekshirib qayta urinib koring.";
+  }
+  isSending=false;
+  input.focus();
+}
+sendBtn.addEventListener("click",send);
+input.addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); send(); } });
+</script>
+</body>
+</html>
