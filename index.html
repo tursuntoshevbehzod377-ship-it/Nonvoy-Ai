@@ -114,19 +114,8 @@ function updateHint(){
   else if(wantVideo) hint.textContent="Video rejimi — video ham chiqadi";
   else hint.textContent="Matn rejimi — faqat yozib javob beradi";
 }
-imgBtn.addEventListener("click",function(){
-  wantImage=!wantImage;
-  imgBtn.classList.toggle("active",wantImage);
-  updateHint();
-  input.focus();
-});
-vidBtn.addEventListener("click",function(){
-  wantVideo=!wantVideo;
-  vidBtn.classList.toggle("active",wantVideo);
-  if(wantVideo) { wantImage=true; imgBtn.classList.add("active"); }
-  updateHint();
-  input.focus();
-});
+imgBtn.addEventListener("click",function(){ wantImage=!wantImage; imgBtn.classList.toggle("active",wantImage); updateHint(); input.focus(); });
+vidBtn.addEventListener("click",function(){ wantVideo=!wantVideo; vidBtn.classList.toggle("active",wantVideo); if(wantVideo){ wantImage=true; imgBtn.classList.add("active"); } updateHint(); input.focus(); });
 function addMessage(text,type){
   document.getElementById("logoWrap").style.display="none";
   var div=document.createElement("div");
@@ -140,28 +129,31 @@ function cleanReply(t){
   t=t.replace(/```[\s\S]*?```/g,"").replace(/`{1,3}/g,"").replace(/\*\*/g,"").replace(/!\[.*?\]\(.*?\)/g,"").replace(/\[.*?\]\(.*?\)/g,"");
   return t.trim();
 }
-function localReply(msg){
+function localReply(msg,doImage){
   var t=msg.toLowerCase().trim();
-  if(t.indexOf("salom")===0 || t.indexOf("assalom")===0) return "Salom! Qandaysiz? Men Nonvoy AI man. Rasm kerak bo'lsa pastdagi Rasm tugmasini bosing.";
+  if(doImage) return "Mana, rasmingizni tayyorladim! Pastda ko'ring.";
+  if(t.indexOf("salom")===0 || t.indexOf("assalom")===0) return "Salom! Qandaysiz? Men Nonvoy AI man.";
   if(t.indexOf("qalesan")>=0 || t.indexOf("qandaysan")>=0) return "Yaxshi, rahmat! Siz qandaysiz?";
-  if(t.indexOf("rahmat")>=0) return "Arzimaydi! Yana savolingiz bo'lsa yozing.";
-  if(t.indexOf("kim")>=0 && t.indexOf("sen")>=0) return "Men Nonvoy AI man — Vodiy nonidek issiq yordamchi. Matn yozaman, rasm chizaman, video qilaman.";
-  return "";
+  if(t.indexOf("rahmat")>=0) return "Arzimaydi!";
+  if(t.indexOf("kim")>=0 && t.indexOf("sen")>=0) return "Men Nonvoy AI man — Vodiy nonidek issiq yordamchi.";
+  return "Tushundim. Hozir server biroz band, lekin ishingizni qildim.";
 }
 function shouldMakeImage(msg){
   if(wantImage || wantVideo) return true;
   var t=msg.toLowerCase().trim();
-  if(t.indexOf("rasm")>=0 || t.indexOf("surat")>=0 || t.indexOf("foto")>=0 || t.indexOf("tasvir")>=0 || t.indexOf("chiz")>=0 || t.indexOf("yarat")>=0 || t.indexOf("video")>=0) return true;
-  if(t.indexOf("salom")===0 || t.indexOf("assalom")===0 || t.indexOf("rahmat")===0) return false;
+  if(t.indexOf("rasm")>=0 || t.indexOf("surat")>=0 || t.indexOf("foto")>=0 || t.indexOf("chiz")>=0 || t.indexOf("yarat")>=0 || t.indexOf("video")>=0) return true;
+  if(t.indexOf("salom")===0 || t.indexOf("assalom")===0) return false;
   if(t.indexOf("?")>=0) return false;
   return false;
 }
 function translate(prompt){
   var e=prompt;
-  e=e.replace(/rasm/gi,"").replace(/chiz/gi,"").replace(/yarat/gi,"").replace(/tasvir/gi,"").replace(/surat/gi,"");
+  e=e.replace(/rasm/gi," ").replace(/chizib/gi," ").replace(/chiz/gi," ").replace(/yarat/gi," ").replace(/ber/gi," ").replace(/tasvir/gi," ").replace(/surat/gi," ");
   var dict={qizil:"red",mashina:"car",mushuk:"cat",it:"dog",uy:"house",gul:"flower",tog:"mountain",dengiz:"sea",qiz:"girl",bola:"boy",shahar:"city",osmon:"sky",quyosh:"sun",oy:"moon",daraxt:"tree",at:"horse",qush:"bird",olma:"apple",kitob:"book",telefon:"phone",robot:"robot",samolyot:"airplane",poezd:"train",kema:"ship",qor:"snow",non:"uzbek bread"};
   Object.keys(dict).forEach(function(k){ e=e.split(k).join(dict[k]); });
-  return "beautiful, highly detailed, cinematic lighting, ultra realistic, professional photography, "+e.trim();
+  e=e.trim();
+  if(!e) e="beautiful landscape";
+  return "beautiful, highly detailed, cinematic lighting, ultra realistic, professional photography, "+e;
 }
 function makeImageUrl(prompt){
   return "https://image.pollinations.ai/prompt/"+encodeURIComponent(translate(prompt))+"?width=1024&height=1024&seed="+Math.floor(Math.random()*999999)+"&nologo=true&model=flux";
@@ -223,7 +215,7 @@ function showImageVideo(message,box,doVideo){
       setTimeout(function(){ vload.remove(); makeVideoFromImage(imgUrl,box); },500);
     }
   };
-  img.onerror=function(){ loading.textContent="Rasm chiqmadi. 45 soniya kutib, Rasm tugmasi yoqilganini tekshirib qayta urinib koring."; };
+  img.onerror=function(){ loading.textContent="Rasm chiqmadi. 45 soniya kutib qayta urinib koring."; };
 }
 async function send(){
   var message=input.value.trim();
@@ -234,6 +226,15 @@ async function send(){
   addMessage(message,"user");
   var box=addMessage("","ai");
   box.textContent="Tayyorlanmoqda...";
+  if(doImage){
+    box.textContent="";
+    var h0=document.createElement("h3"); h0.textContent="💬 Matn"; box.appendChild(h0);
+    var p0=document.createElement("div"); p0.textContent="Mana, rasmingizni tayyorladim!"; box.appendChild(p0);
+    showImageVideo(message,box,doVideo);
+    history.push({role:"user",content:message},{role:"assistant",content:"Rasm tayyorlandi"});
+    input.focus();
+    return;
+  }
   var reply="";
   try{
     var controller=new AbortController();
@@ -248,20 +249,15 @@ async function send(){
     var data=await response.json();
     reply=cleanReply(data.reply || "");
   }catch(e){ reply=""; }
-  if(!reply || reply.indexOf("server band")>=0){
-    var local=localReply(message);
-    if(local) reply=local;
-    else if(!reply) reply="Tushundim. Rasm kerak bo'lsa pastdagi Rasm tugmasini yoqib yozing.";
-  }
+  if(!reply) reply=localReply(message,false);
   box.textContent="";
   var h1=document.createElement("h3"); h1.textContent="💬 Matn"; box.appendChild(h1);
   var p=document.createElement("div"); p.textContent=reply; box.appendChild(p);
   history.push({role:"user",content:message},{role:"assistant",content:reply});
-  if(doImage) showImageVideo(message,box,doVideo);
   input.focus();
 }
 sendBtn.addEventListener("click",send);
 input.addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); send(); } });
 </script>
 </body>
-</html>
+  </html>
